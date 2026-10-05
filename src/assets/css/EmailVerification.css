@@ -1,0 +1,146 @@
+/*--------------------------------------------------------------
+# Email Verification
+--------------------------------------------------------------*/
+
+.email-verification {
+  padding-top: 80px;
+  padding-bottom: 80px;
+}
+
+.email-verification-card {
+  background: var(--surface-color);
+  border: 1px solid #eeeeee;
+  border-radius: 8px;
+  padding: 40px;
+  text-align: center;
+  box-shadow: 0 5px 25px rgba(0, 0, 0, 0.05);
+}
+
+.email-verification-icon {
+  width: 70px;
+  height: 70px;
+  margin: 0 auto 20px;
+  border-radius: 50%;
+  background: rgba(206, 18, 18, 0.08);
+  color: var(--accent-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+}
+
+.email-verification-card h3 {
+  color: var(--heading-color);
+  margin-bottom: 12px;
+}
+
+.email-verification-card > p {
+  color: #777;
+  margin-bottom: 5px;
+}
+
+.verification-email {
+  display: block;
+  color: var(--accent-color);
+  margin-bottom: 25px;
+  word-break: break-word;
+}
+
+.verification-otp-group {
+  text-align: left;
+  margin-top: 25px;
+}
+
+.verification-otp-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+  color: var(--heading-color);
+}
+
+.verification-otp-input {
+  height: 55px;
+  text-align: center;
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: 8px;
+}
+
+.verification-otp-input:focus {
+  border-color: var(--accent-color);
+  box-shadow: 0 0 0 0.15rem rgba(206, 18, 18, 0.1);
+}
+
+.verification-timer {
+  margin: 18px 0;
+  color: #777;
+  font-size: 14px;
+}
+
+.verification-timer strong {
+  color: var(--accent-color);
+}
+
+.verification-error,
+.verification-success {
+  padding: 12px 15px;
+  border-radius: 5px;
+  margin: 15px 0;
+  font-size: 14px;
+}
+
+.verification-error {
+  background: #fff1f1;
+  color: #b02a37;
+}
+
+.verification-success {
+  background: #effaf3;
+  color: #198754;
+}
+
+.verification-loading {
+  padding: 20px 0;
+  color: #777;
+}
+
+.verification-loading .spinner-border {
+  color: var(--accent-color);
+}
+
+.verification-loading p {
+  margin-top: 10px;
+  margin-bottom: 0;
+}
+
+.verification-resend {
+  margin-top: 25px;
+  padding-top: 20px;
+  border-top: 1px solid #eeeeee;
+  font-size: 14px;
+  color: #777;
+}
+
+.verification-resend-button {
+  border: 0;
+  background: transparent;
+  color: var(--accent-color);
+  font-weight: 600;
+  margin-left: 5px;
+  padding: 0;
+  cursor: pointer;
+}
+
+.verification-resend-button:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 576px) {
+  .email-verification-card {
+    padding: 25px 20px;
+  }
+
+  .verification-otp-input {
+    letter-spacing: 5px;
+  }
+}

@@ -1,0 +1,72 @@
+.time-picker {
+  position: relative;
+  width: 100%;
+}
+
+.time-picker-button {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-align: left;
+  cursor: pointer;
+  background: #fff;
+}
+
+.time-picker-button:hover {
+  border-color: #ce1212;
+}
+
+.time-picker-button:focus {
+  border-color: #ce1212;
+  box-shadow: 0 0 0 0.15rem rgba(206, 18, 18, 0.1);
+}
+
+.time-picker-button i:first-child {
+  color: #ce1212;
+}
+
+.time-picker-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  width: 100%;
+  max-height: 260px;
+  overflow-y: auto;
+  background: #fff;
+  border: 1px solid #e9e9e9;
+  border-radius: 6px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+  z-index: 1050;
+  padding: 6px;
+}
+
+.time-picker-option {
+  width: 100%;
+  padding: 9px 12px;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  text-align: left;
+  color: #333;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.time-picker-option:hover {
+  background: rgba(206, 18, 18, 0.08);
+  color: #ce1212;
+}
+
+.time-picker-option.selected {
+  background: #ce1212;
+  color: #fff;
+}
+
+.time-picker-option.selected:hover {
+  background: #ce1212;
+  color: #fff;
+}
