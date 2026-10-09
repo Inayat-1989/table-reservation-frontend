@@ -1,9 +1,5 @@
 import "../src/assets/vendor/bootstrap/css/bootstrap.min.css"
 import "../src/assets/vendor/bootstrap-icons/bootstrap-icons.css"
-// import "aos/dist/aos.css";
-import "../src/assets/vendor/aos/aos.css"
-// import "glightbox/dist/css/glightbox.min.css";
-import "../src/assets/vendor/glightbox/css/glightbox.min.css"
 
 import "./assets/css/main.css";
 

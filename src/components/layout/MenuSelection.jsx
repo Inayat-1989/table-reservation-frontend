@@ -1,27 +1,95 @@
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import {
   updateDraftMenu,
   finalizeDraftReservation,
+  getAvailableMenu,
 } from "../../api/reservationApi";
 
-import { menuItemsData } from "../../services/menu-items";
 import "../../assets/css/MenuSelection.css";
 
+const getMenuItemsFromResponse = (response) => {
+  // Support common Django REST Framework response formats.
+  if (Array.isArray(response)) {
+    return response;
+  }
+
+  if (Array.isArray(response?.results)) {
+    return response.results;
+  }
+
+  if (Array.isArray(response?.items)) {
+    return response.items;
+  }
+
+  return [];
+};
+
+const normalizeMenuItem = (item) => ({
+  ...item,
+  id: item.id,
+  title: item.title ?? item.name ?? "",
+  description: item.description ?? "",
+  src: item.src ?? item.image ?? item.image_url ?? "",
+  price: item.price,
+  isSpecial: item.is_special ?? item.isSpecial ?? false,
+  isAvailable: item.is_available ?? item.isAvailable ?? true,
+});
+
 const MenuSelection = ({ booking, onContinue }) => {
+  const [menuItems, setMenuItems] = useState([]);
   const [selectedItems, setSelectedItems] = useState([]);
   const [submitError, setSubmitError] = useState("");
+  const [menuError, setMenuError] = useState("");
+  const [isLoadingMenu, setIsLoadingMenu] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const isSpecialMenuEligible = booking?.special_menu_eligible === true;
 
-  const visibleMenuItems = menuItemsData.filter((item) => {
+  const loadMenu = useCallback(async () => {
+    setIsLoadingMenu(true);
+    setMenuError("");
+
+    try {
+      const response = await getAvailableMenu();
+      const items = getMenuItemsFromResponse(response)
+        .map(normalizeMenuItem)
+        .filter((item) => item.id != null);
+
+      setMenuItems(items);
+
+      // Remove selections that are no longer available in the response.
+      setSelectedItems((previousItems) =>
+        previousItems.filter((selectedItem) =>
+          items.some((item) => item.id === selectedItem.id && item.isAvailable),
+        ),
+      );
+    } catch (error) {
+      console.error("Menu Selection: Failed to load menu:", error);
+
+      setMenuError(
+        error.message || "Unable to load the menu. Please try again.",
+      );
+    } finally {
+      setIsLoadingMenu(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    loadMenu();
+  }, [loadMenu]);
+
+  const visibleMenuItems = menuItems.filter((item) => {
     if (item.isSpecial && !isSpecialMenuEligible) {
       return false;
     }
 
     return true;
   });
+
+  const isSelected = (itemId) =>
+    selectedItems.some((item) => item.id === itemId);
 
   const handleItemToggle = (item) => {
     if (!item.isAvailable || isSubmitting) {
@@ -46,7 +114,7 @@ const MenuSelection = ({ booking, onContinue }) => {
   };
 
   const handleContinue = async () => {
-    if (isSubmitting) {
+    if (isSubmitting || isLoadingMenu || menuError) {
       return;
     }
 
@@ -60,20 +128,20 @@ const MenuSelection = ({ booking, onContinue }) => {
       const updatedReservation = await updateDraftMenu(selectedMenuItemIds);
 
       console.log(
-        "Menu Selection : Updated Draft Reservation:",
+        "Menu Selection: Updated Draft Reservation:",
         updatedReservation,
       );
 
       const pendingReservation = await finalizeDraftReservation();
 
       console.log(
-        "Menu Selection : Pending Verification Reservation:",
+        "Menu Selection: Pending Verification Reservation:",
         pendingReservation,
       );
 
       onContinue(pendingReservation);
     } catch (error) {
-      console.error("Menu Selection : Failed to finalize reservation:", error);
+      console.error("Menu Selection: Failed to finalize reservation:", error);
 
       if (error.code === "SESSION_NOT_FOUND") {
         setSubmitError(
@@ -108,24 +176,34 @@ const MenuSelection = ({ booking, onContinue }) => {
     }
   };
 
-  const isSelected = (itemId) => {
-    return selectedItems.some((item) => item.id === itemId);
+  const formatPrice = (price) => {
+    if (price == null || price === "") {
+      return "";
+    }
+
+    const numericPrice = Number(price);
+
+    if (!Number.isFinite(numericPrice)) {
+      return price;
+    }
+
+    return `Rs. ${numericPrice.toLocaleString("en-PK")}`;
   };
 
   return (
     <section id="menu-selection" className="menu-selection section">
+      {" "}
       <div className="container">
-        {/* Page Header */}
+        {" "}
         <div className="section-title">
-          <h2>Select Your Menu</h2>
-
+          {" "}
+          <h2>Select Your Menu</h2>{" "}
           <p>
+            {" "}
             <span>Choose</span>{" "}
-            <span className="description-title">Your Food</span>
-          </p>
+            <span className="description-title">Your Food</span>{" "}
+          </p>{" "}
         </div>
-
-        {/* Booking Information */}
         {booking && (
           <div className="mb-4">
             <p className="text-center mb-0">
@@ -133,131 +211,171 @@ const MenuSelection = ({ booking, onContinue }) => {
             </p>
           </div>
         )}
-
-        {/* Menu Items */}
-        <div className="row gy-4">
-          {visibleMenuItems.map((item) => {
-            const selected = isSelected(item.id);
-
-            return (
-              <div className="col-lg-4 col-md-6" key={item.id}>
-                <div
-                  className={`menu-selection-item h-100 ${
-                    !item.isAvailable ? "unavailable" : ""
-                  } ${
-                    item.isSpecial ? "special-item" : ""
-                  } ${selected ? "selected" : ""}`}
-                  onClick={() => handleItemToggle(item)}
-                  role={item.isAvailable ? "button" : undefined}
-                  tabIndex={item.isAvailable ? 0 : -1}
-                >
-                  {/* Image */}
-                  <div className="menu-selection-image position-relative">
-                    <img
-                      src={item.src}
-                      className="img-fluid w-100"
-                      alt={item.title}
-                    />
-
-                    {/* Special Badge */}
-                    {item.isSpecial && (
-                      <span className="menu-special-badge">
-                        <i className="bi bi-star-fill me-1"></i>
-                        Special
-                      </span>
-                    )}
-
-                    {/* Unavailable Overlay */}
-                    {!item.isAvailable && (
-                      <div className="menu-unavailable-overlay">
-                        <span>Unavailable</span>
-                      </div>
-                    )}
-
-                    {/* Selected Indicator */}
-                    {selected && (
-                      <div className="menu-selected-indicator">
-                        <i className="bi bi-check-lg"></i>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Content */}
-                  <div className="menu-selection-content">
-                    <div className="d-flex justify-content-between align-items-start gap-3">
-                      <div>
-                        <h4>{item.title}</h4>
-
-                        {/* Special Label */}
-                        {item.isSpecial && (
-                          <span className="menu-special-label">
-                            <i className="bi bi-star-fill me-1"></i>
-                            Special
-                          </span>
-                        )}
-                      </div>
-
-                      <span className="menu-price">{item.price}</span>
-                    </div>
-
-                    <p>{item.description}</p>
-
-                    {/* Selection Status */}
-                    {item.isAvailable ? (
-                      <div className="menu-selection-status">
-                        {selected ? (
-                          <>
-                            <i className="bi bi-check-circle-fill me-1"></i>
-                            Selected
-                          </>
-                        ) : (
-                          <>
-                            <i className="bi bi-plus-circle me-1"></i>
-                            Select
-                          </>
-                        )}
-                      </div>
-                    ) : (
-                      <div className="menu-selection-status unavailable-text">
-                        <i className="bi bi-x-circle me-1"></i>
-                        Currently unavailable
-                      </div>
-                    )}
-                  </div>
-                </div>
+        {/* Loading state */}
+        {isLoadingMenu && (
+          <div className="text-center py-5" role="status">
+            <span className="spinner-border text-danger" aria-hidden="true" />
+            <p className="mt-3">Loading menu items...</p>
+          </div>
+        )}
+        {/* Fetch error and retry */}
+        {!isLoadingMenu && menuError && (
+          <div className="alert alert-danger mt-4" role="alert">
+            <p className="mb-2">{menuError}</p>
+            <button
+              type="button"
+              className="btn btn-outline-danger"
+              onClick={loadMenu}
+            >
+              Try Again
+            </button>
+          </div>
+        )}
+        {/* Menu items */}
+        {!isLoadingMenu && !menuError && (
+          <>
+            {visibleMenuItems.length === 0 ? (
+              <div className="text-center py-5">
+                <p>No menu items are currently available to display.</p>
               </div>
-            );
-          })}
-        </div>
+            ) : (
+              <div className="row gy-4">
+                {visibleMenuItems.map((item) => {
+                  const selected = isSelected(item.id);
 
-        {/* Error */}
+                  return (
+                    <div className="col-lg-4 col-md-6" key={item.id}>
+                      <div
+                        className={`menu-selection-item h-100 ${
+                          !item.isAvailable ? "unavailable" : ""
+                        } ${
+                          item.isSpecial ? "special-item" : ""
+                        } ${selected ? "selected" : ""}`}
+                        onClick={() => handleItemToggle(item)}
+                        onKeyDown={(event) => {
+                          if (
+                            item.isAvailable &&
+                            (event.key === "Enter" || event.key === " ")
+                          ) {
+                            event.preventDefault();
+                            handleItemToggle(item);
+                          }
+                        }}
+                        role="button"
+                        aria-pressed={selected}
+                        aria-disabled={!item.isAvailable || isSubmitting}
+                        tabIndex={item.isAvailable && !isSubmitting ? 0 : -1}
+                      >
+                        <div className="menu-selection-image position-relative">
+                          {item.src ? (
+                            <img
+                              src={item.src}
+                              className="img-fluid w-100"
+                              alt={item.title}
+                              loading="lazy"
+                            />
+                          ) : (
+                            <div className="text-center p-5">
+                              Image unavailable
+                            </div>
+                          )}
+
+                          {item.isSpecial && (
+                            <span className="menu-special-badge">
+                              <i className="bi bi-star-fill me-1" />
+                              Special
+                            </span>
+                          )}
+
+                          {!item.isAvailable && (
+                            <div className="menu-unavailable-overlay">
+                              <span>Unavailable</span>
+                            </div>
+                          )}
+
+                          {selected && (
+                            <div className="menu-selected-indicator">
+                              <i className="bi bi-check-lg" />
+                            </div>
+                          )}
+                        </div>
+
+                        <div className="menu-selection-content">
+                          <div className="d-flex justify-content-between align-items-start gap-3">
+                            <div>
+                              <h4>{item.title}</h4>
+
+                              {item.isSpecial && (
+                                <span className="menu-special-label">
+                                  <i className="bi bi-star-fill me-1" />
+                                  Special
+                                </span>
+                              )}
+                            </div>
+
+                            <span className="menu-price">
+                              {formatPrice(item.price)}
+                            </span>
+                          </div>
+
+                          <p>{item.description}</p>
+
+                          {item.isAvailable ? (
+                            <div className="menu-selection-status">
+                              {selected ? (
+                                <>
+                                  <i className="bi bi-check-circle-fill me-1" />
+                                  Selected
+                                </>
+                              ) : (
+                                <>
+                                  <i className="bi bi-plus-circle me-1" />
+                                  Select
+                                </>
+                              )}
+                            </div>
+                          ) : (
+                            <div className="menu-selection-status unavailable-text">
+                              <i className="bi bi-x-circle me-1" />
+                              Currently unavailable
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </>
+        )}
+        {/* Reservation submission error */}
         {submitError && (
           <div className="alert alert-danger mt-4" role="alert">
-            <i className="bi bi-exclamation-circle me-2"></i>
+            <i className="bi bi-exclamation-circle me-2" />
             {submitError}
           </div>
         )}
-
         {/* Continue */}
         <div className="text-center mt-5">
           <button
             type="button"
             className="btn-get-started form-button"
             onClick={handleContinue}
-            disabled={isSubmitting}
+            disabled={isSubmitting || isLoadingMenu || !!menuError}
           >
             {isSubmitting ? (
               <>
                 <span
                   className="spinner-border spinner-border-sm me-2"
                   role="status"
-                ></span>
+                />
                 Confirming Reservation...
               </>
             ) : (
               <>
                 Continue
-                <i className="bi bi-arrow-right ms-2"></i>
+                <i className="bi bi-arrow-right ms-2" />
               </>
             )}
           </button>

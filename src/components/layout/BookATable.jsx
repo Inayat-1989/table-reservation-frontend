@@ -7,7 +7,6 @@ import ThemedCalendar from "../ui/ThemedCalendar";
 import TimeSlotPicker from "../ui/TimeSlotPicker";
 import useTimeSlots from "../../hooks/useTimeSlots";
 
-
 const BookATable = ({ onBookingSubmit }) => {
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
 
@@ -32,17 +31,13 @@ const BookATable = ({ onBookingSubmit }) => {
     message: "",
   });
 
-
   const handleChange = (event) => {
     const { name, value } = event.target;
 
     if (name === "people") {
       const people = Number(value);
 
-      if (
-        selectedSlot &&
-        people > selectedSlot.remaining_seats
-      ) {
+      if (selectedSlot && people > selectedSlot.remaining_seats) {
         setPartySizeError(
           `Only ${selectedSlot.remaining_seats} seat(s) remain for this time.`,
         );
@@ -59,7 +54,6 @@ const BookATable = ({ onBookingSubmit }) => {
     }));
   };
 
-
   const handleDateSelect = (date) => {
     setSelectedDate(date);
     setSelectedSlot(null);
@@ -73,7 +67,6 @@ const BookATable = ({ onBookingSubmit }) => {
     }));
   };
 
-
   const handleSlotSelect = (slot) => {
     setSelectedSlot(slot);
     setPartySizeError("");
@@ -85,26 +78,19 @@ const BookATable = ({ onBookingSubmit }) => {
     }));
   };
 
-
   const isSpecialMenuEligible = () => {
     if (!selectedSlot?.starts_at) {
       return false;
     }
 
-    const slotDateTime = new Date(
-      selectedSlot.starts_at,
-    );
+    const slotDateTime = new Date(selectedSlot.starts_at);
 
     const now = new Date();
 
     const twentyFourHours = 24 * 60 * 60 * 1000;
 
-    return (
-      slotDateTime.getTime() - now.getTime() >=
-      twentyFourHours
-    );
+    return slotDateTime.getTime() - now.getTime() >= twentyFourHours;
   };
-
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -116,29 +102,20 @@ const BookATable = ({ onBookingSubmit }) => {
     }
 
     if (!selectedSlot) {
-      setSubmitError(
-        "Please select a date and time before continuing.",
-      );
+      setSubmitError("Please select a date and time before continuing.");
 
       return;
     }
 
     const guestCount = Number(formData.people);
 
-    if (
-      !Number.isInteger(guestCount) ||
-      guestCount < 1
-    ) {
-      setPartySizeError(
-        "Please select a valid party size.",
-      );
+    if (!Number.isInteger(guestCount) || guestCount < 1) {
+      setPartySizeError("Please select a valid party size.");
 
       return;
     }
 
-    if (
-      guestCount > selectedSlot.remaining_seats
-    ) {
+    if (guestCount > selectedSlot.remaining_seats) {
       setPartySizeError(
         `Only ${selectedSlot.remaining_seats} seat(s) remain for this time.`,
       );
@@ -154,15 +131,14 @@ const BookATable = ({ onBookingSubmit }) => {
       guest_count: guestCount,
       customer_note: formData.message.trim(),
     };
-
+    console.log("Book A Table: Before sending to backend:", draftData);
     try {
       setIsSubmitting(true);
 
-      const reservation =
-        await createDraftReservation(draftData);
+      const reservation = await createDraftReservation(draftData);
 
       console.log(
-        "Book A Table : Draft Reservation:",
+        "Book A Table : After Draft Reservation Creation:",
         reservation,
       );
 
@@ -173,15 +149,11 @@ const BookATable = ({ onBookingSubmit }) => {
         error,
       );
 
-      if (
-        error.code === "SLOT_CAPACITY_EXCEEDED"
-      ) {
+      if (error.code === "SLOT_CAPACITY_EXCEEDED") {
         setSubmitError(
           "This time slot no longer has enough available seats. Please select another time.",
         );
-      } else if (
-        error.code === "RESERVATION_ERROR"
-      ) {
+      } else if (error.code === "RESERVATION_ERROR") {
         setSubmitError(
           error.message ||
             "The reservation could not be created. Please try again.",
@@ -197,20 +169,12 @@ const BookATable = ({ onBookingSubmit }) => {
     }
   };
 
+  const remainingSeats = selectedSlot?.remaining_seats ?? null;
 
-  const remainingSeats =
-    selectedSlot?.remaining_seats ?? null;
-
-  const showSpecialMenuWarning =
-    selectedSlot &&
-    !isSpecialMenuEligible();
-
+  const showSpecialMenuWarning = selectedSlot && !isSpecialMenuEligible();
 
   return (
-    <section
-      id="book-a-table"
-      className="book-a-table section"
-    >
+    <section className="book-a-table section">
       {/* Section Title */}
       <div className="container section-title">
         <h2>Book A Table</h2>
@@ -226,7 +190,6 @@ const BookATable = ({ onBookingSubmit }) => {
 
       <div className="container">
         <div className="row g-0">
-
           {/* Reservation Image */}
           <div
             className="col-lg-4 reservation-img"
@@ -234,7 +197,6 @@ const BookATable = ({ onBookingSubmit }) => {
               backgroundImage: `url(${reservation})`,
             }}
           ></div>
-
 
           {/* Reservation Form */}
           <div className="col-lg-8 d-flex align-items-center reservation-form-bg">
@@ -244,7 +206,6 @@ const BookATable = ({ onBookingSubmit }) => {
               className="php-email-form"
             >
               <div className="row gy-4">
-
                 {/* Name */}
                 <div className="col-lg-4 col-md-6">
                   <input
@@ -259,7 +220,6 @@ const BookATable = ({ onBookingSubmit }) => {
                     disabled={isSubmitting}
                   />
                 </div>
-
 
                 {/* Email */}
                 <div className="col-lg-4 col-md-6">
@@ -276,7 +236,6 @@ const BookATable = ({ onBookingSubmit }) => {
                   />
                 </div>
 
-
                 {/* Phone */}
                 <div className="col-lg-4 col-md-6">
                   <input
@@ -292,54 +251,41 @@ const BookATable = ({ onBookingSubmit }) => {
                   />
                 </div>
 
-
                 {/* Date */}
                 <div className="col-lg-4 col-md-6">
                   <div className="date-picker">
                     <button
                       type="button"
                       className="form-control date-picker-button"
-                      onClick={() =>
-                        setIsCalendarOpen(
-                          (previous) => !previous,
-                        )
-                      }
+                      onClick={() => setIsCalendarOpen((previous) => !previous)}
                       disabled={isSubmitting}
                     >
                       <i className="bi bi-calendar3"> </i>
 
                       <span>
                         {selectedDate
-                          ? selectedDate.toLocaleDateString(
-                              "en-US",
-                              {
-                                month: "short",
-                                day: "numeric",
-                                year: "numeric",
-                              },
-                            )
+                          ? selectedDate.toLocaleDateString("en-US", {
+                              month: "short",
+                              day: "numeric",
+                              year: "numeric",
+                            })
                           : "Select a date"}
                       </span>
 
                       <i
                         className={`bi ms-auto ${
-                          isCalendarOpen
-                            ? "bi-chevron-up"
-                            : "bi-chevron-down"
+                          isCalendarOpen ? "bi-chevron-up" : "bi-chevron-down"
                         }`}
                       ></i>
                     </button>
 
                     {isCalendarOpen && (
                       <div className="date-picker-dropdown">
-                        <ThemedCalendar
-                          onDateSelect={handleDateSelect}
-                        />
+                        <ThemedCalendar onDateSelect={handleDateSelect} />
                       </div>
                     )}
                   </div>
                 </div>
-
 
                 {/* Time */}
                 <div className="col-lg-4 col-md-6">
@@ -352,7 +298,6 @@ const BookATable = ({ onBookingSubmit }) => {
                     error={slotsError}
                   />
                 </div>
-
 
                 {/* Number of People */}
                 <div className="col-lg-4 col-md-6">
@@ -378,26 +323,21 @@ const BookATable = ({ onBookingSubmit }) => {
                       Array.from(
                         {
                           length:
-                            selectedSlot.remaining_seats,
+                            selectedSlot.remaining_seats <= 12
+                              ? selectedSlot.remaining_seats
+                              : 12,
                         },
                         (_, index) => {
                           const people = index + 1;
 
                           return (
-                            <option
-                              key={people}
-                              value={people}
-                            >
-                              {people}{" "}
-                              {people === 1
-                                ? "Person"
-                                : "People"}
+                            <option key={people} value={people}>
+                              {people} {people === 1 ? "Person" : "People"}
                             </option>
                           );
                         },
                       )}
                   </select>
-
 
                   {/* Remaining Seats */}
                   {selectedSlot && (
@@ -408,7 +348,6 @@ const BookATable = ({ onBookingSubmit }) => {
                     </small>
                   )}
 
-
                   {/* Party Size Error */}
                   {partySizeError && (
                     <small className="text-danger d-block mt-2">
@@ -418,35 +357,23 @@ const BookATable = ({ onBookingSubmit }) => {
                 </div>
               </div>
 
-
               {/* Special Menu Warning */}
               {showSpecialMenuWarning && (
-                <div
-                  className="alert alert-warning mt-4"
-                  role="alert"
-                >
+                <div className="alert alert-warning mt-4" role="alert">
                   <i className="bi bi-exclamation-triangle me-2"></i>
-
-                  Special menu is not available for
-                  reservations made within 24 hours.
-                  You can still continue with your
-                  reservation.
+                  Special menu is not available for reservations made within 24
+                  hours. You can still continue with your reservation.
                 </div>
               )}
 
-
               {/* Backend Error */}
               {submitError && (
-                <div
-                  className="alert alert-danger mt-4"
-                  role="alert"
-                >
+                <div className="alert alert-danger mt-4" role="alert">
                   <i className="bi bi-exclamation-circle me-2"></i>
 
                   {submitError}
                 </div>
               )}
-
 
               {/* Message */}
               <div className="form-group mt-3">
@@ -461,23 +388,17 @@ const BookATable = ({ onBookingSubmit }) => {
                 ></textarea>
               </div>
 
-
               {/* Submit */}
               <div className="text-center mt-3">
                 <button
                   type="submit"
                   disabled={
-                    !selectedSlot ||
-                    Boolean(partySizeError) ||
-                    isSubmitting
+                    !selectedSlot || Boolean(partySizeError) || isSubmitting
                   }
                 >
-                  {isSubmitting
-                    ? "Creating Reservation..."
-                    : "Continue"}
+                  {isSubmitting ? "Creating Reservation..." : "Continue"}
                 </button>
               </div>
-
             </form>
           </div>
         </div>

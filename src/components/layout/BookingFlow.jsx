@@ -17,7 +17,9 @@ const BookingFlow = () => {
       try {
         const response = await getActiveReservation();
 
-        const reservation = response?.reservation ?? null;
+        // Active reservation endpoint returns the reservation
+        // object directly.
+        const reservation = response.reservation ?? null;
 
         if (!reservation) {
           setBooking(null);
@@ -57,10 +59,16 @@ const BookingFlow = () => {
     restoreBooking();
   }, []);
 
+  useEffect(() => {
+    const element = document.getElementById("book-a-table");
+
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [step]);
+
   const handleBookingSubmit = (reservation) => {
     setBooking(reservation);
-
-    console.log("Booking Flow : Draft Reservation:", reservation);
 
     setStep("menu");
   };
@@ -96,7 +104,7 @@ const BookingFlow = () => {
   }
 
   return (
-    <>
+    <div id="book-a-table">
       {step === "details" && (
         <BookATable onBookingSubmit={handleBookingSubmit} />
       )}
@@ -116,7 +124,7 @@ const BookingFlow = () => {
       {step === "success" && (
         <BookingSuccess booking={booking} onBookAnother={handleBookAnother} />
       )}
-    </>
+    </div>
   );
 };
 
