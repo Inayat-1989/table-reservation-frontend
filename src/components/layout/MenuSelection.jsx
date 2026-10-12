@@ -58,7 +58,6 @@ const MenuSelection = ({ booking, onContinue }) => {
 
       setMenuItems(items);
 
-      // Remove selections that are no longer available in the response.
       setSelectedItems((previousItems) =>
         previousItems.filter((selectedItem) =>
           items.some((item) => item.id === selectedItem.id && item.isAvailable),
@@ -187,7 +186,7 @@ const MenuSelection = ({ booking, onContinue }) => {
       return price;
     }
 
-    return `Rs. ${numericPrice.toLocaleString("en-PK")}`;
+    return `$. ${numericPrice.toLocaleString("en-US")}`;
   };
 
   return (
@@ -270,7 +269,7 @@ const MenuSelection = ({ booking, onContinue }) => {
                           {item.src ? (
                             <img
                               src={item.src}
-                              className="img-fluid w-100"
+                              className="menu-selection-image"
                               alt={item.title}
                               loading="lazy"
                             />

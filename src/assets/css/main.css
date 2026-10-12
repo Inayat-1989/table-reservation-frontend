@@ -106,6 +106,94 @@
   border: 1px solid #e9e9e9;
 }
 
+/* Uniform image area for menu selection cards */
+.menu-selection-image {
+  width: 100%;
+  height: 240px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background-color: #fff;
+}
+
+/* Preserve the complete image without cropping or distortion */
+.menu-selection-img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
+}
+
+/* Keep menu cards aligned */
+.menu-selection-item {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Keep card content below the uniform image area */
+.menu-selection-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Keep selection status at the bottom of each card */
+.menu-selection-status {
+  margin-top: auto;
+  padding-top: 12px;
+}
+
+/* Responsive image dimensions */
+@media (max-width: 767px) {
+  .menu-selection-image {
+    height: 210px;
+  }
+}
+
+@media (max-width: 480px) {
+  .menu-selection-image {
+    height: 190px;
+  }
+}
+
+/* Uniform images in the regular menu grid */
+.menu-item .menu-card-img {
+  display: block;
+  width: 100%;
+  height: 240px;
+  object-fit: contain;
+  object-position: center;
+  margin: 0 auto 16px;
+  background-color: #fff;
+}
+
+/* Consistent menu card layout */
+.menu-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Keep descriptions from creating uneven card heights */
+.menu-item .ingredients {
+  width: 100%;
+}
+
+/* Responsive image dimensions */
+@media (max-width: 767px) {
+  .menu-item .menu-card-img {
+    height: 210px;
+  }
+}
+
+@media (max-width: 480px) {
+  .menu-item .menu-card-img {
+    height: 190px;
+  }
+}
 /* Header buttons */
 .calendar-nav-btn {
   width: 34px;

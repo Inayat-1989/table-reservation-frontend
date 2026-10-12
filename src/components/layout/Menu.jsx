@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { menuItemsData, CATEGORIES } from '../../services/menu-items'
+import { menuItemsData, CATEGORIES } from "../../services/menu-items";
 
 const Menu = () => {
   const [activeCategory, setActiveCategory] = useState("all");
@@ -56,7 +56,7 @@ const Menu = () => {
                 <div className="col-lg-4 menu-item" key={item.id}>
                   <img
                     src={item.src}
-                    className="menu-img img-fluid"
+                    className="menu-img menu-card-img"
                     alt={item.title}
                   />
 
