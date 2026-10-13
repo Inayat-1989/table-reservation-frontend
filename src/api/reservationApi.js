@@ -58,3 +58,9 @@ export function cancelReservation(referenceCode) {
 export function getAvailableMenu() {
   return apiRequest(`/menu/`);
 }
+
+export function cancelDraftReservation() {
+  return apiRequest("/reservations/draft/cancel/", {
+    method: "POST",
+  });
+}

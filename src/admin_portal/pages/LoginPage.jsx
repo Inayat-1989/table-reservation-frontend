@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
 import { useAdminAuth } from "../context/AdminAuthContext";
+import LoadingSpinner from "../components/common/LoadingSpinner";
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -12,7 +13,7 @@ export default function LoginPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   if (isLoading) {
-    return <p>Checking admin session...</p>;
+    return <LoadingSpinner />;
   }
 
   if (isAuthenticated) {

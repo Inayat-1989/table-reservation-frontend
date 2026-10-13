@@ -17,8 +17,6 @@ const BookingFlow = () => {
       try {
         const response = await getActiveReservation();
 
-        // Active reservation endpoint returns the reservation
-        // object directly.
         const reservation = response.reservation ?? null;
 
         if (!reservation) {
@@ -110,7 +108,12 @@ const BookingFlow = () => {
       )}
 
       {step === "menu" && (
-        <MenuSelection booking={booking} onContinue={handleMenuContinue} />
+        <MenuSelection
+          booking={booking}
+          onContinue={handleMenuContinue}
+          onBack={() => setStep("details")}
+          onCancelDraft={handleBookingCancelled}
+        />
       )}
 
       {step === "verification" && (

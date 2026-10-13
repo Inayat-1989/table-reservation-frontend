@@ -1,4 +1,9 @@
-export default function MenuItemFilters({ search, availability, onSearchChange, onAvailabilityChange }) {
+export default function MenuItemFilters({
+  search,
+  availability,
+  onSearchChange,
+  onAvailabilityChange,
+}) {
   return (
     <div className="menu-filters">
       <label className="menu-search-field">
@@ -12,7 +17,10 @@ export default function MenuItemFilters({ search, availability, onSearchChange, 
       </label>
       <label>
         <span>Availability</span>
-        <select value={availability} onChange={(event) => onAvailabilityChange(event.target.value)}>
+        <select
+          value={availability}
+          onChange={(event) => onAvailabilityChange(event.target.value)}
+        >
           <option value="all">All items</option>
           <option value="available">Available</option>
           <option value="unavailable">Unavailable</option>

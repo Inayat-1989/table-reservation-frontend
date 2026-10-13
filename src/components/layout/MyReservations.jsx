@@ -1,14 +1,25 @@
 import { useEffect, useState } from "react";
 
-import { getReservations } from "../../api/reservationApi";
+import { getReservations, cancelReservation } from "../../api/reservationApi";
+
 import { menuItemsData } from "../../services/menu-items";
+
+import ReservationTable from "./my-reservations/ReservationTable";
+import ReservationDetailsModal from "./my-reservations/ReservationDetailsModal";
 
 import "../../assets/css/MyReservations.css";
 
 const MyReservations = () => {
   const [reservations, setReservations] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isCancelling, setIsCancelling] = useState(false);
+  const [cancelError, setCancelError] = useState("");
   const [error, setError] = useState("");
+  const [selectedReservationCode, setSelectedReservationCode] = useState(null);
+
+  const selectedReservation = reservations.find(
+    (reservation) => reservation.reference_code === selectedReservationCode,
+  );
 
   useEffect(() => {
     const loadReservations = async () => {
@@ -18,20 +29,19 @@ const MyReservations = () => {
 
         const response = await getReservations();
 
-        setReservations(
-          response?.results ?? response?.reservations ?? response ?? [],
-        );
-      } catch (error) {
-        console.error("My Reservations : Failed to load reservations:", error);
+        const data =
+          response?.results ?? response?.reservations ?? response ?? [];
 
-        if (error.code === "SESSION_NOT_FOUND") {
-          setError("No reservation session was found.");
-        } else {
-          setError(
-            error.message ||
-              "Unable to load your reservations. Please try again.",
-          );
-        }
+        setReservations(Array.isArray(data) ? data : []);
+      } catch (error) {
+        console.error("My Reservations: Failed to load reservations:", error);
+
+        setError(
+          error.code === "SESSION_NOT_FOUND"
+            ? "No reservation session was found."
+            : error.message ||
+                "Unable to load your reservations. Please try again.",
+        );
       } finally {
         setIsLoading(false);
       }
@@ -40,110 +50,61 @@ const MyReservations = () => {
     loadReservations();
   }, []);
 
-  const formatDate = (dateValue) => {
-    if (!dateValue) {
-      return "Not provided";
-    }
-
-    const date = new Date(dateValue);
-
-    if (Number.isNaN(date.getTime())) {
-      return "Not provided";
-    }
-
-    return date.toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    });
-  };
-
-  const formatTime = (dateValue) => {
-    if (!dateValue) {
-      return "Not provided";
-    }
-
-    const date = new Date(dateValue);
-
-    if (Number.isNaN(date.getTime())) {
-      return "Not provided";
-    }
-
-    return date.toLocaleTimeString("en-US", {
-      hour: "numeric",
-      minute: "2-digit",
-      hour12: true,
-    });
-  };
-
-  const getStatusLabel = (status) => {
-    switch (status) {
-      case "DRAFT":
-        return "Draft";
-
-      case "PENDING_VERIFICATION":
-        return "Pending Verification";
-
-      case "CONFIRMED":
-        return "Confirmed";
-
-      case "CANCELLED":
-        return "Cancelled";
-
-      case "COMPLETED":
-        return "Completed";
-
-      case "EXPIRED":
-        return "Expired";
-
-      default:
-        return status || "Unknown";
-    }
-  };
-
-  const getStatusClass = (status) => {
-    switch (status) {
-      case "CONFIRMED":
-        return "confirmed";
-
-      case "PENDING_VERIFICATION":
-        return "pending";
-
-      case "CANCELLED":
-        return "cancelled";
-
-      case "COMPLETED":
-        return "completed";
-
-      case "EXPIRED":
-        return "expired";
-
-      case "DRAFT":
-        return "draft";
-
-      default:
-        return "";
-    }
-  };
-
   const getSelectedMenuItems = (reservation) => {
     const selectedIds = reservation?.selected_menu_items ?? [];
 
-    return menuItemsData.filter((item) => selectedIds.includes(item.id));
+    return menuItemsData.filter(
+      (item) => selectedIds.includes(item.id) && item.isSpecial,
+    );
   };
+
+  const handleCancel = async (referenceCode) => {
+    const confirmed = window.confirm(
+      "Are you sure you want to cancel this reservation? This action may not be reversible.",
+    );
+
+    if (!confirmed) return;
+
+    try {
+      setIsCancelling(true);
+      setCancelError("");
+
+      const updatedReservation = await cancelReservation(referenceCode);
+
+      setReservations((currentReservations) =>
+        currentReservations.map((reservation) =>
+          reservation.reference_code === referenceCode
+            ? { ...reservation, ...updatedReservation }
+            : reservation,
+        ),
+      );
+    } catch (error) {
+      console.error("Failed to cancel reservation:", error);
+
+      setCancelError(
+        error.message || "Unable to cancel this reservation. Please try again.",
+      );
+    } finally {
+      setIsCancelling(false);
+    }
+  };
+
+  const renderPageTitle = () => (
+    <div className="section-title">
+      <h2>My Reservations</h2>
+
+      <p>
+        <span>Your</span>{" "}
+        <span className="description-title">Reservations</span>
+      </p>
+    </div>
+  );
 
   if (isLoading) {
     return (
       <section id="my-reservations" className="my-reservations section">
         <div className="container">
-          <div className="section-title">
-            <h2>My Reservations</h2>
-
-            <p>
-              <span>Your</span>{" "}
-              <span className="description-title">Reservations</span>
-            </p>
-          </div>
+          {renderPageTitle()}
 
           <div className="my-reservations-state">
             <div className="spinner-border" role="status">
@@ -161,17 +122,10 @@ const MyReservations = () => {
     return (
       <section id="my-reservations" className="my-reservations section">
         <div className="container">
-          <div className="section-title">
-            <h2>My Reservations</h2>
-
-            <p>
-              <span>Your</span>{" "}
-              <span className="description-title">Reservations</span>
-            </p>
-          </div>
+          {renderPageTitle()}
 
           <div className="alert alert-danger" role="alert">
-            <i className="bi bi-exclamation-circle me-2"></i>
+            <i className="bi bi-exclamation-circle me-2" />
             {error}
           </div>
         </div>
@@ -183,22 +137,14 @@ const MyReservations = () => {
     return (
       <section id="my-reservations" className="my-reservations section">
         <div className="container">
-          <div className="section-title">
-            <h2>My Reservations</h2>
-
-            <p>
-              <span>Your</span>{" "}
-              <span className="description-title">Reservations</span>
-            </p>
-          </div>
+          {renderPageTitle()}
 
           <div className="my-reservations-empty">
             <div className="my-reservations-empty-icon">
-              <i className="bi bi-calendar-x"></i>
+              <i className="bi bi-calendar-x" />
             </div>
 
             <h3>No Reservations Yet</h3>
-
             <p>You don't have any reservations yet.</p>
           </div>
         </div>
@@ -209,167 +155,33 @@ const MyReservations = () => {
   return (
     <section id="my-reservations" className="my-reservations section">
       <div className="container">
-        <div className="section-title">
-          <h2>My Reservations</h2>
+        {renderPageTitle()}
 
-          <p>
-            <span>Your</span>{" "}
-            <span className="description-title">Reservations</span>
-          </p>
-        </div>
+        {cancelError && (
+          <div className="alert alert-danger" role="alert">
+            <i className="bi bi-exclamation-circle me-2" />
+            {cancelError}
+          </div>
+        )}
 
-        <div className="row gy-4">
-          {reservations.map((reservation) => {
-            const selectedItems = getSelectedMenuItems(reservation);
-
-            return (
-              <div className="col-lg-6" key={reservation.reference_code}>
-                <div className="reservation-card">
-                  {/* Card Header */}
-                  <div className="reservation-card-header">
-                    <div>
-                      <span className="reservation-reference-label">
-                        Reservation Reference
-                      </span>
-
-                      <strong className="reservation-reference">
-                        {reservation.reference_code}
-                      </strong>
-                    </div>
-
-                    <span
-                      className={`reservation-status ${getStatusClass(
-                        reservation.status,
-                      )}`}
-                    >
-                      {getStatusLabel(reservation.status)}
-                    </span>
-                  </div>
-
-                  {/* Main Reservation Information */}
-                  <div className="reservation-card-body">
-                    <div className="reservation-info-grid">
-                      <div className="reservation-info-item">
-                        <i className="bi bi-person"></i>
-
-                        <div>
-                          <span>Name</span>
-
-                          <strong>
-                            {reservation.customer_name || "Not provided"}
-                          </strong>
-                        </div>
-                      </div>
-
-                      <div className="reservation-info-item">
-                        <i className="bi bi-envelope"></i>
-
-                        <div>
-                          <span>Email</span>
-
-                          <strong>
-                            {reservation.customer_email || "Not provided"}
-                          </strong>
-                        </div>
-                      </div>
-
-                      <div className="reservation-info-item">
-                        <i className="bi bi-calendar-event"></i>
-
-                        <div>
-                          <span>Date</span>
-
-                          <strong>{formatDate(reservation.slot_start)}</strong>
-                        </div>
-                      </div>
-
-                      <div className="reservation-info-item">
-                        <i className="bi bi-clock"></i>
-
-                        <div>
-                          <span>Time</span>
-
-                          <strong>{formatTime(reservation.slot_start)}</strong>
-                        </div>
-                      </div>
-
-                      <div className="reservation-info-item">
-                        <i className="bi bi-people"></i>
-
-                        <div>
-                          <span>Guests</span>
-
-                          <strong>
-                            {reservation.guest_count}{" "}
-                            {Number(reservation.guest_count) === 1
-                              ? "Person"
-                              : "People"}
-                          </strong>
-                        </div>
-                      </div>
-
-                      <div className="reservation-info-item">
-                        <i className="bi bi-telephone"></i>
-
-                        <div>
-                          <span>Phone</span>
-
-                          <strong>
-                            {reservation.customer_phone || "Not provided"}
-                          </strong>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Selected Menu */}
-                    {selectedItems.length > 0 && (
-                      <div className="reservation-menu">
-                        <h5>Selected Menu</h5>
-
-                        <ul>
-                          {selectedItems.map((item) => (
-                            <li
-                              key={item.id}
-                              className={
-                                item.isSpecial ? "special-menu-item" : ""
-                              }
-                            >
-                              <div className="reservation-menu-item-info">
-                                <span>{item.title}</span>
-
-                                {item.isSpecial && (
-                                  <span className="special-menu-badge">
-                                    ⭐ Special
-                                  </span>
-                                )}
-                              </div>
-
-                              <strong>{item.price}</strong>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-
-                    {/* Customer Note */}
-                    {reservation.customer_note && (
-                      <div className="reservation-note">
-                        <i className="bi bi-chat-left-text"></i>
-
-                        <div>
-                          <span>Note</span>
-
-                          <p>{reservation.customer_note}</p>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-            );
-          })}
-        </div>
+        <ReservationTable
+          reservations={reservations}
+          isCancelling={isCancelling}
+          onCancel={handleCancel}
+          onSelect={setSelectedReservationCode}
+          getSelectedMenuItems={getSelectedMenuItems}
+        />
       </div>
+
+      <ReservationDetailsModal
+        reservation={selectedReservation}
+        selectedItems={
+          selectedReservation ? getSelectedMenuItems(selectedReservation) : []
+        }
+        isCancelling={isCancelling}
+        onClose={() => setSelectedReservationCode(null)}
+        onCancel={handleCancel}
+      />
     </section>
   );
 };

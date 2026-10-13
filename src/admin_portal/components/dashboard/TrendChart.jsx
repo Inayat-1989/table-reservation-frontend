@@ -8,14 +8,20 @@ export default function TrendChart({ data }) {
       value: Number(
         isPrimitive(value)
           ? value
-          : raw?.count ?? raw?.total ?? raw?.value ?? raw?.reservation_count ?? raw?.reservations,
+          : (raw?.count ??
+              raw?.total ??
+              raw?.value ??
+              raw?.reservation_count ??
+              raw?.reservations),
       ),
     }))
     .filter((item) => Number.isFinite(item.value))
     .slice(-12);
 
   if (!entries.length) {
-    return <EmptyState message="Reservation trend data is not available in a chartable format." />;
+    return (
+      <EmptyState message="Reservation trend data is not available in a chartable format." />
+    );
   }
 
   const width = 640;
@@ -27,23 +33,45 @@ export default function TrendChart({ data }) {
   const baseline = padding.top + chartHeight;
 
   const points = entries.map((item, index) => {
-    const x = padding.left + (entries.length === 1 ? chartWidth / 2 : (index / (entries.length - 1)) * chartWidth);
+    const x =
+      padding.left +
+      (entries.length === 1
+        ? chartWidth / 2
+        : (index / (entries.length - 1)) * chartWidth);
     const y = baseline - (item.value / maxValue) * chartHeight;
     return { ...item, x, y };
   });
 
-  const linePath = points.map((point, index) => `${index === 0 ? "M" : "L"} ${point.x} ${point.y}`).join(" ");
+  const linePath = points
+    .map((point, index) => `${index === 0 ? "M" : "L"} ${point.x} ${point.y}`)
+    .join(" ");
   const areaPath = `${linePath} L ${points[points.length - 1].x} ${baseline} L ${points[0].x} ${baseline} Z`;
 
   return (
     <div className="dashboard-trend-chart">
-      <svg viewBox={`0 0 ${width} ${height}`} role="img" aria-label="Reservation trend chart" preserveAspectRatio="xMidYMid meet">
+      <svg
+        viewBox={`0 0 ${width} ${height}`}
+        role="img"
+        aria-label="Reservation trend chart"
+        preserveAspectRatio="xMidYMid meet"
+      >
         {[0, 0.5, 1].map((fraction) => {
           const y = padding.top + chartHeight * fraction;
           return (
             <g key={fraction}>
-              <line x1={padding.left} y1={y} x2={width - padding.right} y2={y} className="dashboard-chart-grid" />
-              <text x={padding.left - 8} y={y + 4} textAnchor="end" className="dashboard-chart-axis">
+              <line
+                x1={padding.left}
+                y1={y}
+                x2={width - padding.right}
+                y2={y}
+                className="dashboard-chart-grid"
+              />
+              <text
+                x={padding.left - 8}
+                y={y + 4}
+                textAnchor="end"
+                className="dashboard-chart-axis"
+              >
                 {Math.round(maxValue * (1 - fraction))}
               </text>
             </g>
@@ -53,12 +81,29 @@ export default function TrendChart({ data }) {
         <path d={linePath} className="dashboard-chart-line" />
         {points.map((point, index) => (
           <g key={`${point.label}-${index}`}>
-            <circle cx={point.x} cy={point.y} r="4" className="dashboard-chart-point">
-              <title>{point.label}: {point.value}</title>
+            <circle
+              cx={point.x}
+              cy={point.y}
+              r="4"
+              className="dashboard-chart-point"
+            >
+              <title>
+                {point.label}: {point.value}
+              </title>
             </circle>
-            {(entries.length <= 6 || index === 0 || index === entries.length - 1 || index === Math.floor(entries.length / 2)) && (
-              <text x={point.x} y={height - 10} textAnchor="middle" className="dashboard-chart-axis">
-                {point.label.length > 10 ? `${point.label.slice(0, 10)}…` : point.label}
+            {(entries.length <= 6 ||
+              index === 0 ||
+              index === entries.length - 1 ||
+              index === Math.floor(entries.length / 2)) && (
+              <text
+                x={point.x}
+                y={height - 10}
+                textAnchor="middle"
+                className="dashboard-chart-axis"
+              >
+                {point.label.length > 10
+                  ? `${point.label.slice(0, 10)}…`
+                  : point.label}
               </text>
             )}
           </g>

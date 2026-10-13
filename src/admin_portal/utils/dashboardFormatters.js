@@ -19,8 +19,12 @@ function formatLocalTime(hour, minute = 0) {
   const parsedMinute = Number(minute);
 
   if (
-    !Number.isInteger(parsedHour) || parsedHour < 0 || parsedHour > 23 ||
-    !Number.isInteger(parsedMinute) || parsedMinute < 0 || parsedMinute > 59
+    !Number.isInteger(parsedHour) ||
+    parsedHour < 0 ||
+    parsedHour > 23 ||
+    !Number.isInteger(parsedMinute) ||
+    parsedMinute < 0 ||
+    parsedMinute > 59
   ) {
     return "Unknown time";
   }
@@ -69,7 +73,9 @@ export function formatValue(value) {
 }
 
 export function isPrimitive(value) {
-  return value === null || ["string", "number", "boolean"].includes(typeof value);
+  return (
+    value === null || ["string", "number", "boolean"].includes(typeof value)
+  );
 }
 
 export function getEntries(data) {
@@ -78,12 +84,23 @@ export function getEntries(data) {
       if (isPrimitive(item)) return [`Item ${index + 1}`, item];
 
       const label =
-        item.title ?? item.name ?? item.label ?? item.date ?? item.day ??
-        item.hour ?? item.time ?? `Item ${index + 1}`;
+        item.title ??
+        item.name ??
+        item.label ??
+        item.date ??
+        item.day ??
+        item.hour ??
+        item.time ??
+        `Item ${index + 1}`;
 
       const value =
-        item.count ?? item.total ?? item.value ?? item.reservations ??
-        item.selection_count ?? item.guest_count ?? item.reservation_count;
+        item.count ??
+        item.total ??
+        item.value ??
+        item.reservations ??
+        item.selection_count ??
+        item.guest_count ??
+        item.reservation_count;
 
       return [label, value ?? item, item];
     });
@@ -128,7 +145,9 @@ export function getSummaryCards(summary) {
   ];
 
   const normalized = entries.map(([key, value, raw]) => ({
-    key: String(key), value, raw,
+    key: String(key),
+    value,
+    raw,
   }));
 
   const preferred = preferredKeys

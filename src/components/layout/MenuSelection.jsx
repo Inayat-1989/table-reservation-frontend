@@ -4,12 +4,18 @@ import {
   updateDraftMenu,
   finalizeDraftReservation,
   getAvailableMenu,
+  cancelDraftReservation,
 } from "../../api/reservationApi";
 
 import "../../assets/css/MenuSelection.css";
 
+import MenuSelectionHeader from "./menu-selection/MenuSelectionHeader";
+import MenuSelectionState from "./menu-selection/MenuSelectionState";
+import MenuItemsGrid from "./menu-selection/MenuItemsGrid";
+import MenuSelectionError from "./menu-selection/MenuSelectionError";
+import MenuSelectionActions from "./menu-selection/MenuSelectionActions";
+
 const getMenuItemsFromResponse = (response) => {
-  // Support common Django REST Framework response formats.
   if (Array.isArray(response)) {
     return response;
   }
@@ -36,15 +42,19 @@ const normalizeMenuItem = (item) => ({
   isAvailable: item.is_available ?? item.isAvailable ?? true,
 });
 
-const MenuSelection = ({ booking, onContinue }) => {
+const MenuSelection = ({ booking, onContinue, onBack, onCancelDraft }) => {
   const [menuItems, setMenuItems] = useState([]);
   const [selectedItems, setSelectedItems] = useState([]);
   const [submitError, setSubmitError] = useState("");
   const [menuError, setMenuError] = useState("");
   const [isLoadingMenu, setIsLoadingMenu] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isCancellingDraft, setIsCancellingDraft] = useState(false);
 
+  // The backend is the source of truth for eligibility.
   const isSpecialMenuEligible = booking?.special_menu_eligible === true;
+
+  const isActionInProgress = isSubmitting || isCancellingDraft;
 
   const loadMenu = useCallback(async () => {
     setIsLoadingMenu(true);
@@ -52,15 +62,19 @@ const MenuSelection = ({ booking, onContinue }) => {
 
     try {
       const response = await getAvailableMenu();
+
       const items = getMenuItemsFromResponse(response)
         .map(normalizeMenuItem)
-        .filter((item) => item.id != null);
+        .filter(
+          (item) => item.id != null && item.isAvailable && item.isSpecial,
+        );
 
       setMenuItems(items);
 
+      // Keep only selections that remain available.
       setSelectedItems((previousItems) =>
         previousItems.filter((selectedItem) =>
-          items.some((item) => item.id === selectedItem.id && item.isAvailable),
+          items.some((item) => item.id === selectedItem.id),
         ),
       );
     } catch (error) {
@@ -79,19 +93,10 @@ const MenuSelection = ({ booking, onContinue }) => {
     loadMenu();
   }, [loadMenu]);
 
-  const visibleMenuItems = menuItems.filter((item) => {
-    if (item.isSpecial && !isSpecialMenuEligible) {
-      return false;
-    }
-
-    return true;
-  });
-
-  const isSelected = (itemId) =>
-    selectedItems.some((item) => item.id === itemId);
+  const visibleMenuItems = isSpecialMenuEligible ? menuItems : [];
 
   const handleItemToggle = (item) => {
-    if (!item.isAvailable || isSubmitting) {
+    if (!item.isAvailable || isSubmitting || isCancellingDraft) {
       return;
     }
 
@@ -112,8 +117,50 @@ const MenuSelection = ({ booking, onContinue }) => {
     });
   };
 
+  const handleBack = () => {
+    if (isActionInProgress) {
+      return;
+    }
+
+    // Go back without cancelling the draft.
+    onBack?.();
+  };
+
+  const handleCancelDraft = async () => {
+    if (isActionInProgress) {
+      return;
+    }
+
+    const confirmed = window.confirm(
+      "Are you sure you want to cancel this draft reservation? This action cannot be undone.",
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    try {
+      setIsCancellingDraft(true);
+      setSubmitError("");
+
+      await cancelDraftReservation();
+
+      // Navigate away only after backend cancellation succeeds.
+      onCancelDraft?.();
+    } catch (error) {
+      console.error("Menu Selection: Failed to cancel draft:", error);
+
+      setSubmitError(
+        error.message ||
+          "Unable to cancel the draft reservation. Please try again.",
+      );
+    } finally {
+      setIsCancellingDraft(false);
+    }
+  };
+
   const handleContinue = async () => {
-    if (isSubmitting || isLoadingMenu || menuError) {
+    if (isActionInProgress || isLoadingMenu || menuError) {
       return;
     }
 
@@ -175,210 +222,40 @@ const MenuSelection = ({ booking, onContinue }) => {
     }
   };
 
-  const formatPrice = (price) => {
-    if (price == null || price === "") {
-      return "";
-    }
-
-    const numericPrice = Number(price);
-
-    if (!Number.isFinite(numericPrice)) {
-      return price;
-    }
-
-    return `$. ${numericPrice.toLocaleString("en-US")}`;
-  };
-
   return (
     <section id="menu-selection" className="menu-selection section">
-      {" "}
       <div className="container">
-        {" "}
-        <div className="section-title">
-          {" "}
-          <h2>Select Your Menu</h2>{" "}
-          <p>
-            {" "}
-            <span>Choose</span>{" "}
-            <span className="description-title">Your Food</span>{" "}
-          </p>{" "}
-        </div>
-        {booking && (
-          <div className="mb-4">
-            <p className="text-center mb-0">
-              Select the items you would like to add to your reservation.
-            </p>
-          </div>
+        <MenuSelectionHeader booking={booking} />
+
+        <MenuSelectionState
+          isLoading={isLoadingMenu}
+          menuError={menuError}
+          isSpecialMenuEligible={isSpecialMenuEligible}
+          visibleItemCount={visibleMenuItems.length}
+          onRetry={loadMenu}
+          isActionInProgress={isActionInProgress}
+        />
+
+        {!isLoadingMenu && !menuError && visibleMenuItems.length > 0 && (
+          <MenuItemsGrid
+            items={visibleMenuItems}
+            selectedItems={selectedItems}
+            disabled={isActionInProgress}
+            onToggle={handleItemToggle}
+          />
         )}
-        {/* Loading state */}
-        {isLoadingMenu && (
-          <div className="text-center py-5" role="status">
-            <span className="spinner-border text-danger" aria-hidden="true" />
-            <p className="mt-3">Loading menu items...</p>
-          </div>
-        )}
-        {/* Fetch error and retry */}
-        {!isLoadingMenu && menuError && (
-          <div className="alert alert-danger mt-4" role="alert">
-            <p className="mb-2">{menuError}</p>
-            <button
-              type="button"
-              className="btn btn-outline-danger"
-              onClick={loadMenu}
-            >
-              Try Again
-            </button>
-          </div>
-        )}
-        {/* Menu items */}
-        {!isLoadingMenu && !menuError && (
-          <>
-            {visibleMenuItems.length === 0 ? (
-              <div className="text-center py-5">
-                <p>No menu items are currently available to display.</p>
-              </div>
-            ) : (
-              <div className="row gy-4">
-                {visibleMenuItems.map((item) => {
-                  const selected = isSelected(item.id);
 
-                  return (
-                    <div className="col-lg-4 col-md-6" key={item.id}>
-                      <div
-                        className={`menu-selection-item h-100 ${
-                          !item.isAvailable ? "unavailable" : ""
-                        } ${
-                          item.isSpecial ? "special-item" : ""
-                        } ${selected ? "selected" : ""}`}
-                        onClick={() => handleItemToggle(item)}
-                        onKeyDown={(event) => {
-                          if (
-                            item.isAvailable &&
-                            (event.key === "Enter" || event.key === " ")
-                          ) {
-                            event.preventDefault();
-                            handleItemToggle(item);
-                          }
-                        }}
-                        role="button"
-                        aria-pressed={selected}
-                        aria-disabled={!item.isAvailable || isSubmitting}
-                        tabIndex={item.isAvailable && !isSubmitting ? 0 : -1}
-                      >
-                        <div className="menu-selection-image position-relative">
-                          {item.src ? (
-                            <img
-                              src={item.src}
-                              className="menu-selection-image"
-                              alt={item.title}
-                              loading="lazy"
-                            />
-                          ) : (
-                            <div className="text-center p-5">
-                              Image unavailable
-                            </div>
-                          )}
+        <MenuSelectionError message={submitError} />
 
-                          {item.isSpecial && (
-                            <span className="menu-special-badge">
-                              <i className="bi bi-star-fill me-1" />
-                              Special
-                            </span>
-                          )}
-
-                          {!item.isAvailable && (
-                            <div className="menu-unavailable-overlay">
-                              <span>Unavailable</span>
-                            </div>
-                          )}
-
-                          {selected && (
-                            <div className="menu-selected-indicator">
-                              <i className="bi bi-check-lg" />
-                            </div>
-                          )}
-                        </div>
-
-                        <div className="menu-selection-content">
-                          <div className="d-flex justify-content-between align-items-start gap-3">
-                            <div>
-                              <h4>{item.title}</h4>
-
-                              {item.isSpecial && (
-                                <span className="menu-special-label">
-                                  <i className="bi bi-star-fill me-1" />
-                                  Special
-                                </span>
-                              )}
-                            </div>
-
-                            <span className="menu-price">
-                              {formatPrice(item.price)}
-                            </span>
-                          </div>
-
-                          <p>{item.description}</p>
-
-                          {item.isAvailable ? (
-                            <div className="menu-selection-status">
-                              {selected ? (
-                                <>
-                                  <i className="bi bi-check-circle-fill me-1" />
-                                  Selected
-                                </>
-                              ) : (
-                                <>
-                                  <i className="bi bi-plus-circle me-1" />
-                                  Select
-                                </>
-                              )}
-                            </div>
-                          ) : (
-                            <div className="menu-selection-status unavailable-text">
-                              <i className="bi bi-x-circle me-1" />
-                              Currently unavailable
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-          </>
-        )}
-        {/* Reservation submission error */}
-        {submitError && (
-          <div className="alert alert-danger mt-4" role="alert">
-            <i className="bi bi-exclamation-circle me-2" />
-            {submitError}
-          </div>
-        )}
-        {/* Continue */}
-        <div className="text-center mt-5">
-          <button
-            type="button"
-            className="btn-get-started form-button"
-            onClick={handleContinue}
-            disabled={isSubmitting || isLoadingMenu || !!menuError}
-          >
-            {isSubmitting ? (
-              <>
-                <span
-                  className="spinner-border spinner-border-sm me-2"
-                  role="status"
-                />
-                Confirming Reservation...
-              </>
-            ) : (
-              <>
-                Continue
-                <i className="bi bi-arrow-right ms-2" />
-              </>
-            )}
-          </button>
-        </div>
+        <MenuSelectionActions
+          onBack={handleBack}
+          onCancelDraft={handleCancelDraft}
+          onContinue={handleContinue}
+          isSubmitting={isSubmitting}
+          isCancellingDraft={isCancellingDraft}
+          isLoadingMenu={isLoadingMenu}
+          menuError={menuError}
+        />
       </div>
     </section>
   );
