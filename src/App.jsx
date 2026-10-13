@@ -67,16 +67,13 @@ function App() {
 
         <Route path="/admin_portal/verify-otp" element={<AdminOTPPage />} />
 
-        {/* Admin portal layout and nested pages */}
         <Route path="/admin_portal" element={<AdminLayout />}>
           <Route index element={<AdminDashboardPage />} />
           <Route path="reservations" element={<ReservationsPage />} />
           <Route path="menu/items" element={<MenuItemsPage />} />
           <Route path="menu/categories" element={<MenuCategoriesPage />} />
-          {/* We'll add more admin routes here. */}
         </Route>
 
-        {/* Unknown routes */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </AdminAuthProvider>

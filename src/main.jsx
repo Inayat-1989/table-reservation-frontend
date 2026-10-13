@@ -1,6 +1,3 @@
-import "../src/assets/vendor/bootstrap/css/bootstrap.min.css";
-import "../src/assets/vendor/bootstrap-icons/bootstrap-icons.css";
-
 import "./assets/css/main.css";
 
 import { StrictMode } from "react";

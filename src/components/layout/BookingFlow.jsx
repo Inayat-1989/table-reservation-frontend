@@ -37,7 +37,7 @@ const BookingFlow = () => {
             break;
 
           case "CONFIRMED":
-            setStep("success");
+            setStep("details");
             break;
 
           default:

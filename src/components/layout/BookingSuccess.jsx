@@ -39,8 +39,7 @@ const BookingSuccess = ({ booking, onBookAnother }) => {
     });
   };
 
-  const selectedMenuItemIds =
-    booking?.selected_menu_items ?? [];
+  const selectedMenuItemIds = booking?.selected_menu_items ?? [];
 
   const selectedItems = menuItemsData.filter((item) =>
     selectedMenuItemIds.includes(item.id),
@@ -49,10 +48,7 @@ const BookingSuccess = ({ booking, onBookAnother }) => {
   const guestCount = Number(booking?.guest_count);
 
   return (
-    <section
-      id="booking-success"
-      className="booking-success section"
-    >
+    <section id="booking-success" className="booking-success section">
       <div className="container">
         <div className="row justify-content-center">
           <div className="col-lg-8 col-xl-7">
@@ -69,17 +65,15 @@ const BookingSuccess = ({ booking, onBookAnother }) => {
               <h2>Thank You for Your Booking!</h2>
 
               <p className="booking-success-message">
-                Your email has been verified and your reservation
-                is confirmed. We look forward to welcoming you!
+                Your email has been verified and your reservation is confirmed.
+                We look forward to welcoming you!
               </p>
 
               {/* Reservation Reference */}
               {booking?.reference_code && (
                 <div className="booking-reference">
                   <span>Reservation Reference</span>
-                  <strong>
-                    {booking.reference_code}
-                  </strong>
+                  <strong>{booking.reference_code}</strong>
                 </div>
               )}
 
@@ -93,10 +87,7 @@ const BookingSuccess = ({ booking, onBookAnother }) => {
 
                   <div>
                     <span>Name</span>
-                    <strong>
-                      {booking?.customer_name ||
-                        "Not provided"}
-                    </strong>
+                    <strong>{booking?.customer_name || "Not provided"}</strong>
                   </div>
                 </div>
 
@@ -106,10 +97,7 @@ const BookingSuccess = ({ booking, onBookAnother }) => {
 
                   <div>
                     <span>Email</span>
-                    <strong>
-                      {booking?.customer_email ||
-                        "Not provided"}
-                    </strong>
+                    <strong>{booking?.customer_email || "Not provided"}</strong>
                   </div>
                 </div>
 
@@ -119,10 +107,7 @@ const BookingSuccess = ({ booking, onBookAnother }) => {
 
                   <div>
                     <span>Phone</span>
-                    <strong>
-                      {booking?.customer_phone ||
-                        "Not provided"}
-                    </strong>
+                    <strong>{booking?.customer_phone || "Not provided"}</strong>
                   </div>
                 </div>
 
@@ -132,9 +117,7 @@ const BookingSuccess = ({ booking, onBookAnother }) => {
 
                   <div>
                     <span>Date</span>
-                    <strong>
-                      {formatDate(booking?.slot_start)}
-                    </strong>
+                    <strong>{formatDate(booking?.slot_start)}</strong>
                   </div>
                 </div>
 
@@ -144,9 +127,7 @@ const BookingSuccess = ({ booking, onBookAnother }) => {
 
                   <div>
                     <span>Time</span>
-                    <strong>
-                      {formatTime(booking?.slot_start)}
-                    </strong>
+                    <strong>{formatTime(booking?.slot_start)}</strong>
                   </div>
                 </div>
 
@@ -158,12 +139,9 @@ const BookingSuccess = ({ booking, onBookAnother }) => {
                     <span>Guests</span>
 
                     <strong>
-                      {Number.isFinite(guestCount) &&
-                      guestCount > 0
+                      {Number.isFinite(guestCount) && guestCount > 0
                         ? `${guestCount} ${
-                            guestCount === 1
-                              ? "Person"
-                              : "People"
+                            guestCount === 1 ? "Person" : "People"
                           }`
                         : "Not provided"}
                     </strong>
@@ -177,9 +155,7 @@ const BookingSuccess = ({ booking, onBookAnother }) => {
 
                     <div>
                       <span>Note</span>
-                      <strong>
-                        {booking.customer_note}
-                      </strong>
+                      <strong>{booking.customer_note}</strong>
                     </div>
                   </div>
                 )}
@@ -194,9 +170,7 @@ const BookingSuccess = ({ booking, onBookAnother }) => {
                         <li key={item.id}>
                           <span>{item.title}</span>
 
-                          <strong>
-                            {item.price}
-                          </strong>
+                          <strong>{item.price}</strong>
                         </li>
                       ))}
                     </ul>
@@ -207,9 +181,8 @@ const BookingSuccess = ({ booking, onBookAnother }) => {
               {/* Information Note */}
               <div className="booking-success-note">
                 <i className="bi bi-info-circle me-2"></i>
-
-                Please keep your reservation reference
-                for future correspondence.
+                Please keep your reservation reference for future
+                correspondence.
               </div>
 
               {/* Make Another Reservation */}
@@ -219,7 +192,6 @@ const BookingSuccess = ({ booking, onBookAnother }) => {
                 onClick={onBookAnother}
               >
                 Make Another Reservation
-
                 <i className="bi bi-arrow-right ms-2"></i>
               </button>
             </div>
