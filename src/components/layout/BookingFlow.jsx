@@ -57,14 +57,6 @@ const BookingFlow = () => {
     restoreBooking();
   }, []);
 
-  useEffect(() => {
-    const element = document.getElementById("book-a-table");
-
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth" });
-    }
-  }, [step]);
-
   const handleBookingSubmit = (reservation) => {
     setBooking(reservation);
 
@@ -97,35 +89,42 @@ const BookingFlow = () => {
     setStep("details");
   };
 
-  if (isRestoring) {
-    return null;
-  }
-
   return (
     <div id="book-a-table">
-      {step === "details" && (
-        <BookATable onBookingSubmit={handleBookingSubmit} />
-      )}
+      {isRestoring ? (
+        <div className="container py-5 text-center" role="status">
+          <p>Restoring your booking...</p>
+        </div>
+      ) : (
+        <>
+          {step === "details" && (
+            <BookATable onBookingSubmit={handleBookingSubmit} />
+          )}
 
-      {step === "menu" && (
-        <MenuSelection
-          booking={booking}
-          onContinue={handleMenuContinue}
-          onBack={() => setStep("details")}
-          onCancelDraft={handleBookingCancelled}
-        />
-      )}
+          {step === "menu" && (
+            <MenuSelection
+              booking={booking}
+              onContinue={handleMenuContinue}
+              onBack={() => setStep("details")}
+              onCancelDraft={handleBookingCancelled}
+            />
+          )}
 
-      {step === "verification" && (
-        <EmailVerification
-          booking={booking}
-          onVerified={handleEmailVerified}
-          onCancelled={handleBookingCancelled}
-        />
-      )}
+          {step === "verification" && (
+            <EmailVerification
+              booking={booking}
+              onVerified={handleEmailVerified}
+              onCancelled={handleBookingCancelled}
+            />
+          )}
 
-      {step === "success" && (
-        <BookingSuccess booking={booking} onBookAnother={handleBookAnother} />
+          {step === "success" && (
+            <BookingSuccess
+              booking={booking}
+              onBookAnother={handleBookAnother}
+            />
+          )}
+        </>
       )}
     </div>
   );

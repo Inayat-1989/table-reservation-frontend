@@ -66,16 +66,28 @@ const Contact = () => {
       <div className="container">
         {/* Google Maps */}
         <div className="mb-5">
-          <iframe
-            title="Restaurant Location"
+          <div
             style={{
               width: "100%",
               height: "400px",
+              background: "#f1f1f1",
+              overflow: "hidden",
             }}
-            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3400.987502341463!2d74.3574529!3d31.5245032!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x391905fc22cdd065%3A0xd4090bc5c90e818a!2sPinnacloid!5e0!3m2!1sen!2s!4v1790954149351!5m2!1sen!2s"
-            frameBorder="0"
-            allowFullScreen
-          ></iframe>
+          >
+            <iframe
+              title="Restaurant Location"
+              src="https://maps.google.com/maps?q=Pinnacloid%2C%20Lahore%2C%20Pakistan&t=&z=15&ie=UTF8&iwloc=&output=embed"
+              style={{
+                display: "block",
+                width: "100%",
+                height: "400px",
+                border: 0,
+              }}
+              loading="eager"
+              allowFullScreen
+              referrerPolicy="no-referrer-when-downgrade"
+            />
+          </div>
         </div>
 
         {/* Contact Information */}

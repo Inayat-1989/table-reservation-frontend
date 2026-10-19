@@ -1,0 +1,204 @@
+.cancellation-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(20, 25, 35, 0.58);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  animation: cancellation-backdrop-in 180ms ease-out;
+}
+
+.cancellation-modal {
+  width: 100%;
+  max-width: 460px;
+  padding: 32px;
+  border-radius: 16px;
+  background: #fff;
+  color: #333;
+  text-align: center;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.2);
+  animation: cancellation-modal-in 200ms ease-out;
+}
+
+.cancellation-modal-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 20px;
+  border-radius: 50%;
+  background: #fff0ed;
+  color: #d93025;
+  font-size: 28px;
+}
+
+.cancellation-modal h2 {
+  margin: 0 0 12px;
+  color: #292929;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.cancellation-modal > p {
+  margin: 0 0 22px;
+  color: #666;
+  font-size: 15px;
+  line-height: 1.65;
+}
+
+.cancellation-reservation-reference {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 22px;
+  padding: 14px;
+  border: 1px solid #eee;
+  border-radius: 10px;
+  background: #fafafa;
+}
+
+.cancellation-reservation-reference span {
+  color: #777;
+  font-size: 12px;
+}
+
+.cancellation-reservation-reference strong {
+  color: #333;
+  font-size: 15px;
+  overflow-wrap: anywhere;
+}
+
+.cancellation-modal-error {
+  display: flex;
+  gap: 9px;
+  align-items: flex-start;
+  margin-bottom: 18px;
+  padding: 12px;
+  border: 1px solid #f3c6c3;
+  border-radius: 8px;
+  background: #fff2f1;
+  color: #a3231b;
+  text-align: left;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.cancellation-modal-actions {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 10px;
+}
+
+.cancellation-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  min-height: 46px;
+  padding: 12px 16px;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background-color 160ms ease,
+    border-color 160ms ease,
+    transform 160ms ease;
+}
+
+.cancellation-btn:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.cancellation-btn:focus-visible {
+  outline: 3px solid rgba(50, 110, 220, 0.35);
+  outline-offset: 3px;
+}
+
+.cancellation-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
+.cancellation-btn-secondary {
+  border-color: #ddd;
+  background: #fff;
+  color: #444;
+}
+
+.cancellation-btn-secondary:hover:not(:disabled) {
+  background: #f5f5f5;
+}
+
+.cancellation-btn-danger {
+  background: #c92a24;
+  color: #fff;
+}
+
+.cancellation-btn-danger:hover:not(:disabled) {
+  background: #ad211c;
+}
+
+.cancellation-btn-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.45);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: cancellation-spin 700ms linear infinite;
+}
+
+@keyframes cancellation-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes cancellation-backdrop-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes cancellation-modal-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@media (min-width: 420px) {
+  .cancellation-modal-actions {
+    flex-direction: row;
+  }
+
+  .cancellation-btn {
+    flex: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cancellation-modal-backdrop,
+  .cancellation-modal,
+  .cancellation-btn,
+  .cancellation-btn-spinner {
+    animation-duration: 0.01ms;
+    transition-duration: 0.01ms;
+  }
+}

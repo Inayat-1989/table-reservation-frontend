@@ -6,7 +6,8 @@ import { menuItemsData } from "../../services/menu-items";
 
 import ReservationTable from "./my-reservations/ReservationTable";
 import ReservationDetailsModal from "./my-reservations/ReservationDetailsModal";
-
+import MobileReservationCarousel from "./my-reservations/MobileReservationCarousel";
+import ConfirmActionModal from "../common/ConfirmActionModal";
 import "../../assets/css/MyReservations.css";
 
 const MyReservations = () => {
@@ -16,6 +17,32 @@ const MyReservations = () => {
   const [cancelError, setCancelError] = useState("");
   const [error, setError] = useState("");
   const [selectedReservationCode, setSelectedReservationCode] = useState(null);
+  const [pendingCancellationCode, setPendingCancellationCode] = useState(null);
+  const [isMobile, setIsMobile] = useState(() =>
+    typeof window !== "undefined"
+      ? window.matchMedia("(max-width: 767px)").matches
+      : false,
+  );
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia("(max-width: 767px)");
+
+    const handleViewportChange = (event) => {
+      setIsMobile(event.matches);
+    };
+
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setIsMobile(mediaQuery.matches);
+    mediaQuery.addEventListener("change", handleViewportChange);
+
+    return () => {
+      mediaQuery.removeEventListener("change", handleViewportChange);
+    };
+  }, []);
+
+  const pendingReservation = reservations.find(
+    (reservation) => reservation.reference_code === pendingCancellationCode,
+  );
 
   const selectedReservation = reservations.find(
     (reservation) => reservation.reference_code === selectedReservationCode,
@@ -58,12 +85,17 @@ const MyReservations = () => {
     );
   };
 
-  const handleCancel = async (referenceCode) => {
-    const confirmed = window.confirm(
-      "Are you sure you want to cancel this reservation? This action may not be reversible.",
-    );
+  const handleCancel = (referenceCode) => {
+    if (isCancelling) return;
 
-    if (!confirmed) return;
+    setCancelError("");
+    setPendingCancellationCode(referenceCode);
+  };
+
+  const confirmCancellation = async () => {
+    if (!pendingReservation || isCancelling) return;
+
+    const referenceCode = pendingReservation.reference_code;
 
     try {
       setIsCancelling(true);
@@ -78,6 +110,12 @@ const MyReservations = () => {
             : reservation,
         ),
       );
+
+      setPendingCancellationCode(null);
+
+      setSelectedReservationCode((currentCode) =>
+        currentCode === referenceCode ? null : currentCode,
+      );
     } catch (error) {
       console.error("Failed to cancel reservation:", error);
 
@@ -88,7 +126,6 @@ const MyReservations = () => {
       setIsCancelling(false);
     }
   };
-
   const renderPageTitle = () => (
     <div className="section-title">
       <h2>My Reservations</h2>
@@ -157,20 +194,23 @@ const MyReservations = () => {
       <div className="container">
         {renderPageTitle()}
 
-        {cancelError && (
-          <div className="alert alert-danger" role="alert">
-            <i className="bi bi-exclamation-circle me-2" />
-            {cancelError}
-          </div>
+        {isMobile ? (
+          <MobileReservationCarousel
+            reservations={reservations}
+            isCancelling={isCancelling}
+            onCancel={handleCancel}
+            onSelect={setSelectedReservationCode}
+            getSelectedMenuItems={getSelectedMenuItems}
+          />
+        ) : (
+          <ReservationTable
+            reservations={reservations}
+            isCancelling={isCancelling}
+            onCancel={handleCancel}
+            onSelect={setSelectedReservationCode}
+            getSelectedMenuItems={getSelectedMenuItems}
+          />
         )}
-
-        <ReservationTable
-          reservations={reservations}
-          isCancelling={isCancelling}
-          onCancel={handleCancel}
-          onSelect={setSelectedReservationCode}
-          getSelectedMenuItems={getSelectedMenuItems}
-        />
       </div>
 
       <ReservationDetailsModal
@@ -181,6 +221,28 @@ const MyReservations = () => {
         isCancelling={isCancelling}
         onClose={() => setSelectedReservationCode(null)}
         onCancel={handleCancel}
+      />
+
+      <ConfirmActionModal
+        isOpen={Boolean(pendingReservation)}
+        title="Cancel Reservation?"
+        message={
+          pendingReservation
+            ? `Are you sure you want to cancel reservation ${pendingReservation.reference_code}? This action cannot be undone.`
+            : "Are you sure you want to cancel this reservation?"
+        }
+        confirmText="Cancel Reservation"
+        cancelText="Keep Reservation"
+        isLoading={isCancelling}
+        error={cancelError}
+        variant="danger"
+        onConfirm={confirmCancellation}
+        onClose={() => {
+          if (isCancelling) return;
+
+          setPendingCancellationCode(null);
+          setCancelError("");
+        }}
       />
     </section>
   );

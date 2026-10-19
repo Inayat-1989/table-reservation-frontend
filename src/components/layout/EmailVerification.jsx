@@ -6,6 +6,8 @@ import {
   verifyReservationOtp,
 } from "../../api/reservationApi";
 
+import ConfirmActionModal from "../common/ConfirmActionModal";
+
 import "../../assets/css/MenuSelection.css";
 
 const VERIFICATION_DURATION = 15 * 60;
@@ -15,6 +17,7 @@ const EmailVerification = ({ booking, onVerified, onCancelled }) => {
   const [remainingSeconds, setRemainingSeconds] = useState(
     VERIFICATION_DURATION,
   );
+  const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
 
   const [status, setStatus] = useState({
     loading: false,
@@ -25,11 +28,9 @@ const EmailVerification = ({ booking, onVerified, onCancelled }) => {
     success: "",
   });
 
-  const reservationReference =
-    booking?.reference_code;
+  const reservationReference = booking?.reference_code;
 
-  const customerEmail =
-    booking?.customer_email;
+  const customerEmail = booking?.customer_email;
 
   /*
    * The OTP should already have been generated and
@@ -57,41 +58,30 @@ const EmailVerification = ({ booking, onVerified, onCancelled }) => {
    * Countdown.
    */
   useEffect(() => {
-    if (
-      status.loading ||
-      remainingSeconds <= 0
-    ) {
+    if (status.loading || remainingSeconds <= 0) {
       return;
     }
 
     const timer = setInterval(() => {
-      setRemainingSeconds(
-        (previousSeconds) => {
-          if (previousSeconds <= 1) {
-            clearInterval(timer);
-            return 0;
-          }
+      setRemainingSeconds((previousSeconds) => {
+        if (previousSeconds <= 1) {
+          clearInterval(timer);
+          return 0;
+        }
 
-          return previousSeconds - 1;
-        },
-      );
+        return previousSeconds - 1;
+      });
     }, 1000);
 
     return () => {
       clearInterval(timer);
     };
-  }, [
-    status.loading,
-    remainingSeconds,
-  ]);
+  }, [status.loading, remainingSeconds]);
 
   const formatTime = () => {
-    const minutes = Math.floor(
-      remainingSeconds / 60,
-    );
+    const minutes = Math.floor(remainingSeconds / 60);
 
-    const seconds =
-      remainingSeconds % 60;
+    const seconds = remainingSeconds % 60;
 
     return `${String(minutes).padStart(
       2,
@@ -100,8 +90,7 @@ const EmailVerification = ({ booking, onVerified, onCancelled }) => {
   };
 
   const handleOtpChange = (event) => {
-    const value =
-      event.target.value.replace(/\D/g, "");
+    const value = event.target.value.replace(/\D/g, "");
 
     if (value.length <= 6) {
       setOtp(value);
@@ -133,8 +122,7 @@ const EmailVerification = ({ booking, onVerified, onCancelled }) => {
     if (!reservationReference) {
       setStatus((previousStatus) => ({
         ...previousStatus,
-        error:
-          "Reservation information is missing.",
+        error: "Reservation information is missing.",
       }));
 
       return;
@@ -143,8 +131,7 @@ const EmailVerification = ({ booking, onVerified, onCancelled }) => {
     if (remainingSeconds <= 0) {
       setStatus((previousStatus) => ({
         ...previousStatus,
-        error:
-          "The verification code has expired. Please request a new code.",
+        error: "The verification code has expired. Please request a new code.",
       }));
 
       return;
@@ -153,8 +140,7 @@ const EmailVerification = ({ booking, onVerified, onCancelled }) => {
     if (otp.length !== 6) {
       setStatus((previousStatus) => ({
         ...previousStatus,
-        error:
-          "Please enter the 6-digit verification code.",
+        error: "Please enter the 6-digit verification code.",
       }));
 
       return;
@@ -167,16 +153,9 @@ const EmailVerification = ({ booking, onVerified, onCancelled }) => {
         error: "",
       }));
 
-      const reservation =
-        await verifyReservationOtp(
-          reservationReference,
-          otp,
-        );
+      const reservation = await verifyReservationOtp(reservationReference, otp);
 
-      console.log(
-        "Email Verification : Confirmed Reservation:",
-        reservation,
-      );
+      console.log("Email Verification : Confirmed Reservation:", reservation);
 
       setStatus({
         loading: false,
@@ -184,8 +163,7 @@ const EmailVerification = ({ booking, onVerified, onCancelled }) => {
         resending: false,
         cancelling: false,
         error: "",
-        success:
-          "Email verified successfully.",
+        success: "Email verified successfully.",
       });
 
       /*
@@ -194,17 +172,12 @@ const EmailVerification = ({ booking, onVerified, onCancelled }) => {
        */
       onVerified(reservation);
     } catch (error) {
-      console.error(
-        "Email Verification : OTP verification failed:",
-        error,
-      );
+      console.error("Email Verification : OTP verification failed:", error);
 
       setStatus((previousStatus) => ({
         ...previousStatus,
         verifying: false,
-        error:
-          error.message ||
-          "Unable to verify the code.",
+        error: error.message || "Unable to verify the code.",
         success: "",
       }));
     }
@@ -232,13 +205,9 @@ const EmailVerification = ({ booking, onVerified, onCancelled }) => {
     });
 
     try {
-      await resendReservationOtp(
-        reservationReference,
-      );
+      await resendReservationOtp(reservationReference);
 
-      setRemainingSeconds(
-        VERIFICATION_DURATION,
-      );
+      setRemainingSeconds(VERIFICATION_DURATION);
 
       setStatus({
         loading: false,
@@ -246,32 +215,23 @@ const EmailVerification = ({ booking, onVerified, onCancelled }) => {
         resending: false,
         cancelling: false,
         error: "",
-        success:
-          "A new verification code has been sent.",
+        success: "A new verification code has been sent.",
       });
     } catch (error) {
-      console.error(
-        "Email Verification : Resend failed:",
-        error,
-      );
+      console.error("Email Verification : Resend failed:", error);
 
       setStatus({
         loading: false,
         verifying: false,
         resending: false,
         cancelling: false,
-        error:
-          error.message ||
-          "Unable to resend verification code.",
+        error: error.message || "Unable to resend verification code.",
         success: "",
       });
     }
   };
 
-  /*
-   * Cancel reservation.
-   */
-  const handleCancel = async () => {
+  const handleCancel = () => {
     if (
       !reservationReference ||
       status.cancelling ||
@@ -281,68 +241,60 @@ const EmailVerification = ({ booking, onVerified, onCancelled }) => {
       return;
     }
 
-    const shouldCancel = window.confirm(
-      "Are you sure you want to cancel this reservation and start a new booking?",
-    );
+    setStatus((previousStatus) => ({
+      ...previousStatus,
+      error: "",
+      success: "",
+    }));
 
-    if (!shouldCancel) {
+    setIsCancelModalOpen(true);
+  };
+
+  const confirmCancel = async () => {
+    if (
+      !reservationReference ||
+      status.cancelling ||
+      status.verifying ||
+      status.resending
+    ) {
       return;
     }
 
-    setStatus({
-      loading: false,
-      verifying: false,
-      resending: false,
+    setStatus((previousStatus) => ({
+      ...previousStatus,
       cancelling: true,
       error: "",
       success: "",
-    });
+    }));
 
     try {
-      const response =
-        await cancelReservation(
-          reservationReference,
-        );
+      const response = await cancelReservation(reservationReference);
 
-      console.log(
-        "Email Verification : Reservation cancelled:",
-        response,
-      );
+      console.log("Email Verification: Reservation cancelled:", response);
 
+      setIsCancelModalOpen(false);
       onCancelled();
     } catch (error) {
-      console.error(
-        "Email Verification : Cancel failed:",
-        error,
-      );
+      console.error("Email Verification: Cancel failed:", error);
 
-      setStatus({
-        loading: false,
-        verifying: false,
-        resending: false,
+      setStatus((previousStatus) => ({
+        ...previousStatus,
         cancelling: false,
-        error:
-          error.message ||
-          "Unable to cancel the reservation.",
+        error: error.message || "Unable to cancel the reservation.",
         success: "",
-      });
+      }));
     }
   };
 
   return (
-    <section
-      id="email-verification"
-      className="email-verification section"
-    >
+    <section id="email-verification" className="email-verification section">
       <div className="container">
         <div className="section-title">
           <h2>Email Verification</h2>
 
           <p>
             <span>Verify</span>{" "}
-            <span className="description-title">
-              Your Email
-            </span>
+            <span className="description-title">Your Email</span>
           </p>
         </div>
 
@@ -356,32 +308,19 @@ const EmailVerification = ({ booking, onVerified, onCancelled }) => {
                 <h3>Check Your Email</h3>
               </div>
 
-              <p>
-                We have sent a 6-digit
-                verification code to:
-              </p>
+              <p>We have sent a 6-digit verification code to:</p>
 
-              <strong className="verification-email">
-                {customerEmail}
-              </strong>
+              <strong className="verification-email">{customerEmail}</strong>
 
-              {/* Error */}
-              {status.error && (
-                <div
-                  className="verification-error"
-                  role="alert"
-                >
+              {status.error && !isCancelModalOpen && (
+                <div className="verification-error" role="alert">
                   <i className="bi bi-exclamation-circle me-2"></i>
                   {status.error}
                 </div>
               )}
 
-              {/* Success */}
               {status.success && (
-                <div
-                  className="verification-success"
-                  role="status"
-                >
+                <div className="verification-success" role="status">
                   <i className="bi bi-check-circle me-2"></i>
                   {status.success}
                 </div>
@@ -390,9 +329,7 @@ const EmailVerification = ({ booking, onVerified, onCancelled }) => {
               {/* OTP Form */}
               <form onSubmit={handleSubmit}>
                 <div className="verification-otp-group">
-                  <label htmlFor="otp">
-                    Enter Verification Code
-                  </label>
+                  <label htmlFor="otp">Enter Verification Code</label>
 
                   <input
                     id="otp"
@@ -418,15 +355,10 @@ const EmailVerification = ({ booking, onVerified, onCancelled }) => {
 
                   {remainingSeconds > 0 ? (
                     <>
-                      Code expires in{" "}
-                      <strong>
-                        {formatTime()}
-                      </strong>
+                      Code expires in <strong>{formatTime()}</strong>
                     </>
                   ) : (
-                    <strong>
-                      Verification code expired
-                    </strong>
+                    <strong>Verification code expired</strong>
                   )}
                 </div>
 
@@ -447,7 +379,6 @@ const EmailVerification = ({ booking, onVerified, onCancelled }) => {
                         className="spinner-border spinner-border-sm me-2"
                         role="status"
                       ></span>
-
                       Verifying...
                     </>
                   ) : (
@@ -461,23 +392,17 @@ const EmailVerification = ({ booking, onVerified, onCancelled }) => {
 
               {/* Resend */}
               <div className="verification-resend">
-                <span>
-                  Didn't receive the code?
-                </span>
+                <span>Didn't receive the code?</span>
 
                 <button
                   type="button"
                   onClick={handleResend}
                   className="verification-resend-button"
                   disabled={
-                    status.resending ||
-                    status.verifying ||
-                    status.cancelling
+                    status.resending || status.verifying || status.cancelling
                   }
                 >
-                  {status.resending
-                    ? "Sending..."
-                    : "Resend Code"}
+                  {status.resending ? "Sending..." : "Resend Code"}
                 </button>
               </div>
 
@@ -488,9 +413,7 @@ const EmailVerification = ({ booking, onVerified, onCancelled }) => {
                   onClick={handleCancel}
                   className="verification-cancel-button"
                   disabled={
-                    status.cancelling ||
-                    status.verifying ||
-                    status.resending
+                    status.cancelling || status.verifying || status.resending
                   }
                 >
                   {status.cancelling ? (
@@ -499,7 +422,6 @@ const EmailVerification = ({ booking, onVerified, onCancelled }) => {
                         className="spinner-border spinner-border-sm me-2"
                         role="status"
                       ></span>
-
                       Cancelling...
                     </>
                   ) : (
@@ -514,6 +436,28 @@ const EmailVerification = ({ booking, onVerified, onCancelled }) => {
           </div>
         </div>
       </div>
+
+      <ConfirmActionModal
+        isOpen={isCancelModalOpen}
+        title="Cancel This Booking?"
+        message="Are you sure you want to cancel this reservation and start a new booking? This action cannot be undone."
+        confirmText="Yes, Cancel Booking"
+        cancelText="Keep Booking"
+        isLoading={status.cancelling}
+        error={isCancelModalOpen ? status.error : ""}
+        variant="danger"
+        onConfirm={confirmCancel}
+        onClose={() => {
+          if (status.cancelling) return;
+
+          setIsCancelModalOpen(false);
+
+          setStatus((previousStatus) => ({
+            ...previousStatus,
+            error: "",
+          }));
+        }}
+      />
     </section>
   );
 };

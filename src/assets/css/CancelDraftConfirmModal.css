@@ -1,0 +1,180 @@
+.cancel-draft-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(20, 25, 35, 0.58);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  animation: cancel-draft-fade-in 180ms ease-out;
+}
+
+.cancel-draft-modal {
+  width: 100%;
+  max-width: 460px;
+  padding: 32px;
+  border-radius: 16px;
+  background: #fff;
+  color: #333;
+  text-align: center;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.2);
+  animation: cancel-draft-modal-in 200ms ease-out;
+}
+
+.cancel-draft-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 20px;
+  border-radius: 50%;
+  background: #fff0ed;
+  color: #d93025;
+  font-size: 28px;
+}
+
+.cancel-draft-modal h2 {
+  margin: 0 0 12px;
+  color: #292929;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.cancel-draft-modal > p {
+  margin: 0 0 22px;
+  color: #666;
+  font-size: 15px;
+  line-height: 1.65;
+}
+
+.cancel-draft-error {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  margin-bottom: 18px;
+  padding: 12px;
+  border: 1px solid #f3c6c3;
+  border-radius: 8px;
+  background: #fff2f1;
+  color: #a3231b;
+  text-align: left;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.cancel-draft-actions {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 10px;
+}
+
+.cancel-draft-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  min-height: 46px;
+  padding: 12px 16px;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background-color 160ms ease,
+    transform 160ms ease;
+}
+
+.cancel-draft-btn:focus-visible {
+  outline: 3px solid rgba(50, 110, 220, 0.35);
+  outline-offset: 3px;
+}
+
+.cancel-draft-btn:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.cancel-draft-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
+.cancel-draft-btn-secondary {
+  border-color: #ddd;
+  background: #fff;
+  color: #444;
+}
+
+.cancel-draft-btn-secondary:hover:not(:disabled) {
+  background: #f5f5f5;
+}
+
+.cancel-draft-btn-danger {
+  background: #c92a24;
+  color: #fff;
+}
+
+.cancel-draft-btn-danger:hover:not(:disabled) {
+  background: #ad211c;
+}
+
+.cancel-draft-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.45);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: cancel-draft-spin 700ms linear infinite;
+}
+
+@keyframes cancel-draft-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes cancel-draft-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes cancel-draft-modal-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@media (min-width: 420px) {
+  .cancel-draft-actions {
+    flex-direction: row;
+  }
+
+  .cancel-draft-btn {
+    flex: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cancel-draft-backdrop,
+  .cancel-draft-modal,
+  .cancel-draft-btn,
+  .cancel-draft-spinner {
+    animation-duration: 0.01ms;
+    transition-duration: 0.01ms;
+  }
+}

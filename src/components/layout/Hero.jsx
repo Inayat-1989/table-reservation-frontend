@@ -1,6 +1,35 @@
+import { useLocation, useNavigate } from "react-router-dom";
 import heroImg from "../../assets/img/hero-img.png";
+import { smoothScrollTo } from "../../utils/smoothScroll";
 
 function Hero() {
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const handleBookTableClick = (event) => {
+    event.preventDefault();
+
+    if (location.pathname !== "/") {
+      navigate("/", {
+        state: { scrollTo: "book-a-table" },
+        preventScrollReset: true,
+      });
+
+      return;
+    }
+
+    const target = document.getElementById("book-a-table");
+
+    if (!target) {
+      console.error("Navigation target not found: #book-a-table");
+      return;
+    }
+
+    const headerHeight = document.getElementById("header")?.offsetHeight ?? 0;
+
+    smoothScrollTo(target, headerHeight, 900);
+  };
+
   return (
     <section
       id="hero"
@@ -22,7 +51,11 @@ function Hero() {
             </p>
 
             <div className="d-flex">
-              <a href="#book-a-table" className="btn-get-started">
+              <a
+                href="/#book-a-table"
+                className="btn-get-started"
+                onClick={handleBookTableClick}
+              >
                 Book a Table
               </a>
             </div>

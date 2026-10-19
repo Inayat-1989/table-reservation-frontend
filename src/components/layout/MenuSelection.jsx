@@ -14,7 +14,7 @@ import MenuSelectionState from "./menu-selection/MenuSelectionState";
 import MenuItemsGrid from "./menu-selection/MenuItemsGrid";
 import MenuSelectionError from "./menu-selection/MenuSelectionError";
 import MenuSelectionActions from "./menu-selection/MenuSelectionActions";
-
+import ConfirmActionModal from "../common/ConfirmActionModal";
 const getMenuItemsFromResponse = (response) => {
   if (Array.isArray(response)) {
     return response;
@@ -50,6 +50,7 @@ const MenuSelection = ({ booking, onContinue, onBack, onCancelDraft }) => {
   const [isLoadingMenu, setIsLoadingMenu] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isCancellingDraft, setIsCancellingDraft] = useState(false);
+  const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
 
   // The backend is the source of truth for eligibility.
   const isSpecialMenuEligible = booking?.special_menu_eligible === true;
@@ -122,20 +123,20 @@ const MenuSelection = ({ booking, onContinue, onBack, onCancelDraft }) => {
       return;
     }
 
-    // Go back without cancelling the draft.
     onBack?.();
   };
 
-  const handleCancelDraft = async () => {
+  const handleCancelDraft = () => {
     if (isActionInProgress) {
       return;
     }
 
-    const confirmed = window.confirm(
-      "Are you sure you want to cancel this draft reservation? This action cannot be undone.",
-    );
+    setSubmitError("");
+    setIsCancelModalOpen(true);
+  };
 
-    if (!confirmed) {
+  const confirmCancelDraft = async () => {
+    if (isActionInProgress || !isCancelModalOpen) {
       return;
     }
 
@@ -145,7 +146,9 @@ const MenuSelection = ({ booking, onContinue, onBack, onCancelDraft }) => {
 
       await cancelDraftReservation();
 
-      // Navigate away only after backend cancellation succeeds.
+      setIsCancelModalOpen(false);
+
+      // Leave the booking flow only after successful cancellation.
       onCancelDraft?.();
     } catch (error) {
       console.error("Menu Selection: Failed to cancel draft:", error);
@@ -245,8 +248,7 @@ const MenuSelection = ({ booking, onContinue, onBack, onCancelDraft }) => {
           />
         )}
 
-        <MenuSelectionError message={submitError} />
-
+        <MenuSelectionError message={isCancelModalOpen ? "" : submitError} />
         <MenuSelectionActions
           onBack={handleBack}
           onCancelDraft={handleCancelDraft}
@@ -257,6 +259,24 @@ const MenuSelection = ({ booking, onContinue, onBack, onCancelDraft }) => {
           menuError={menuError}
         />
       </div>
+
+      <ConfirmActionModal
+        isOpen={isCancelModalOpen}
+        title="Cancel This Booking?"
+        message="Are you sure you want to cancel your draft reservation? Your current booking progress will be lost, and this action cannot be undone."
+        confirmText="Confirm Cancellation"
+        cancelText="Keep Booking"
+        isLoading={isCancellingDraft}
+        error={isCancelModalOpen ? submitError : ""}
+        variant="danger"
+        onConfirm={confirmCancelDraft}
+        onClose={() => {
+          if (isCancellingDraft) return;
+
+          setIsCancelModalOpen(false);
+          setSubmitError("");
+        }}
+      />
     </section>
   );
 };
