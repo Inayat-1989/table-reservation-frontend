@@ -65,29 +65,14 @@ const Contact = () => {
 
       <div className="container">
         {/* Google Maps */}
-        <div className="mb-5">
-          <div
-            style={{
-              width: "100%",
-              height: "400px",
-              background: "#f1f1f1",
-              overflow: "hidden",
-            }}
-          >
-            <iframe
-              title="Restaurant Location"
-              src="https://maps.google.com/maps?q=Pinnacloid%2C%20Lahore%2C%20Pakistan&t=&z=15&ie=UTF8&iwloc=&output=embed"
-              style={{
-                display: "block",
-                width: "100%",
-                height: "400px",
-                border: 0,
-              }}
-              loading="eager"
-              allowFullScreen
-              referrerPolicy="no-referrer-when-downgrade"
-            />
-          </div>
+        <div className="contact-map-wrapper mb-5">
+          <iframe
+            title="Restaurant Location"
+            src="https://maps.google.com/maps?q=Pinnacloid%2C%20Lahore%2C%20Pakistan&t=&z=15&ie=UTF8&iwloc=&output=embed"
+            loading="lazy"
+            allowFullScreen
+            referrerPolicy="no-referrer-when-downgrade"
+          />
         </div>
 
         {/* Contact Information */}

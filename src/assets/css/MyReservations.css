@@ -2,6 +2,71 @@
   padding-top: 80px;
 }
 
+/* Mobile: vertically scroll through reservation cards */
+.mobile-reservation-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+}
+
+.mobile-reservation-load-more {
+  display: flex;
+  justify-content: center;
+  min-height: 24px;
+  margin-top: 16px;
+  text-align: center;
+}
+
+.mobile-reservation-load-more p {
+  margin: 0;
+  color: #777;
+  font-size: 13px;
+}
+
+/* Desktop server-side pagination */
+.reservations-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  padding: 16px;
+  border-top: 1px solid #eee;
+}
+
+.reservations-pagination > span {
+  color: #777;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.reservations-page-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 8px 12px;
+  border: 1px solid #e5e5e5;
+  border-radius: 6px;
+  background: #fff;
+  color: #444;
+  font-size: 13px;
+  cursor: pointer;
+  transition:
+    color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.reservations-page-button:hover:not(:disabled) {
+  color: #ce1212;
+  border-color: #ce1212;
+}
+
+.reservations-page-button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
 .my-reservations-state {
   text-align: center;
   padding: 60px 20px;

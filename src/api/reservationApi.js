@@ -1,8 +1,11 @@
 import { apiRequest } from "./client";
 
-export function getReservations() {
-  return apiRequest("/reservations/");
+export function getReservations(page = 1) {
+  return apiRequest(`/reservations/?page=${page}`, {
+    method: "GET",
+  });
 }
+
 
 export function getActiveReservation() {
   return apiRequest("/reservations/active/");
@@ -63,4 +66,13 @@ export function cancelDraftReservation() {
   return apiRequest("/reservations/draft/cancel/", {
     method: "POST",
   });
+}
+
+export async function getReservationOtpExpiry(referenceCode) {
+  return apiRequest(
+    `/reservations/${referenceCode}/otp-expiry/`,
+    {
+      method: "GET",
+    }
+  );
 }

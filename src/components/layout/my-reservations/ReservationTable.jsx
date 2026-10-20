@@ -1,3 +1,4 @@
+
 import {
   formatDate,
   formatTime,
@@ -13,6 +14,11 @@ const ReservationTable = ({
   onCancel,
   onSelect,
   getSelectedMenuItems,
+  currentPage,
+  totalPages,
+  onPreviousPage,
+  onNextPage,
+  isLoadingPage,
 }) => {
   return (
     <div className="reservations-table-container">
@@ -131,6 +137,30 @@ const ReservationTable = ({
             })}
           </tbody>
         </table>
+      </div>
+
+      <div className="reservations-pagination">
+        <button
+          type="button"
+          className="reservations-page-button"
+          onClick={onPreviousPage}
+          disabled={currentPage <= 1 || isLoadingPage}
+        >
+          <i className="bi bi-chevron-left" /> Previous
+        </button>
+
+        <span>
+          Page {currentPage} of {Math.max(totalPages, 1)}
+        </span>
+
+        <button
+          type="button"
+          className="reservations-page-button"
+          onClick={onNextPage}
+          disabled={currentPage >= totalPages || isLoadingPage}
+        >
+          Next <i className="bi bi-chevron-right" />
+        </button>
       </div>
 
       <div className="reservations-table-footer">

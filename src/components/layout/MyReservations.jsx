@@ -1,6 +1,9 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
-import { getReservations, cancelReservation } from "../../api/reservationApi";
+import {
+  getReservations,
+  cancelReservation,
+} from "../../api/reservationApi";
 
 import { menuItemsData } from "../../services/menu-items";
 
@@ -13,11 +16,23 @@ import "../../assets/css/MyReservations.css";
 const MyReservations = () => {
   const [reservations, setReservations] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isLoadingPage, setIsLoadingPage] = useState(false);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [isCancelling, setIsCancelling] = useState(false);
+
   const [cancelError, setCancelError] = useState("");
   const [error, setError] = useState("");
-  const [selectedReservationCode, setSelectedReservationCode] = useState(null);
-  const [pendingCancellationCode, setPendingCancellationCode] = useState(null);
+
+  const [selectedReservationCode, setSelectedReservationCode] =
+    useState(null);
+  const [pendingCancellationCode, setPendingCancellationCode] =
+    useState(null);
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
+  const [pageSize, setPageSize] = useState(5);
+  const [hasNextPage, setHasNextPage] = useState(false);
+
   const [isMobile, setIsMobile] = useState(() =>
     typeof window !== "undefined"
       ? window.matchMedia("(max-width: 767px)").matches
@@ -31,8 +46,6 @@ const MyReservations = () => {
       setIsMobile(event.matches);
     };
 
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setIsMobile(mediaQuery.matches);
     mediaQuery.addEventListener("change", handleViewportChange);
 
     return () => {
@@ -41,41 +54,165 @@ const MyReservations = () => {
   }, []);
 
   const pendingReservation = reservations.find(
-    (reservation) => reservation.reference_code === pendingCancellationCode,
+    (reservation) =>
+      reservation.reference_code === pendingCancellationCode,
   );
 
   const selectedReservation = reservations.find(
-    (reservation) => reservation.reference_code === selectedReservationCode,
+    (reservation) =>
+      reservation.reference_code === selectedReservationCode,
   );
 
-  useEffect(() => {
-    const loadReservations = async () => {
+  const loadReservations = useCallback(
+    async (pageNumber, { append = false, initial = false } = {}) => {
       try {
-        setIsLoading(true);
+        if (initial) {
+          setIsLoading(true);
+        } else if (append) {
+          setIsLoadingMore(true);
+        } else {
+          setIsLoadingPage(true);
+        }
+
         setError("");
 
-        const response = await getReservations();
+        const response = await getReservations(pageNumber);
 
-        const data =
-          response?.results ?? response?.reservations ?? response ?? [];
+        const results = Array.isArray(response?.results)
+          ? response.results
+          : [];
 
-        setReservations(Array.isArray(data) ? data : []);
-      } catch (error) {
-        console.error("My Reservations: Failed to load reservations:", error);
+        setReservations((previous) => {
+          if (!append) return results;
+
+          const existingCodes = new Set(
+            previous.map((item) => item.reference_code),
+          );
+
+          return [
+            ...previous,
+            ...results.filter(
+              (item) => !existingCodes.has(item.reference_code),
+            ),
+          ];
+        });
+
+        setCurrentPage(pageNumber);
+        setTotalCount(Number(response?.count ?? results.length));
+
+        const receivedPageSize = Number(response?.page_size);
+
+        if (Number.isFinite(receivedPageSize) && receivedPageSize > 0) {
+          setPageSize(receivedPageSize);
+        }
+
+        setHasNextPage(Boolean(response?.next));
+      } catch (requestError) {
+        console.error(
+          "My Reservations: Failed to load reservations:",
+          requestError,
+        );
 
         setError(
-          error.code === "SESSION_NOT_FOUND"
+          requestError.code === "SESSION_NOT_FOUND"
             ? "No reservation session was found."
-            : error.message ||
+            : requestError.message ||
                 "Unable to load your reservations. Please try again.",
         );
       } finally {
         setIsLoading(false);
+        setIsLoadingPage(false);
+        setIsLoadingMore(false);
+      }
+    },
+    [],
+  );
+
+  // Load page one on entry and when switching between mobile and desktop.
+  useEffect(() => {
+    let active = true;
+
+    const loadInitialPage = async () => {
+      setIsLoading(true);
+      setError("");
+      setCurrentPage(1);
+      setTotalCount(0);
+      setHasNextPage(false);
+      setReservations([]);
+
+      try {
+        const response = await getReservations(1);
+
+        if (!active) return;
+
+        const results = Array.isArray(response?.results)
+          ? response.results
+          : [];
+
+        setReservations(results);
+        setCurrentPage(1);
+        setTotalCount(Number(response?.count ?? results.length));
+
+        const receivedPageSize = Number(response?.page_size);
+
+        if (Number.isFinite(receivedPageSize) && receivedPageSize > 0) {
+          setPageSize(receivedPageSize);
+        }
+
+        setHasNextPage(Boolean(response?.next));
+      } catch (requestError) {
+        if (!active) return;
+
+        console.error(
+          "My Reservations: Failed to load reservations:",
+          requestError,
+        );
+
+        setError(
+          requestError.code === "SESSION_NOT_FOUND"
+            ? "No reservation session was found."
+            : requestError.message ||
+                "Unable to load your reservations. Please try again.",
+        );
+      } finally {
+        if (active) setIsLoading(false);
       }
     };
 
-    loadReservations();
-  }, []);
+    loadInitialPage();
+
+    return () => {
+      active = false;
+    };
+  }, [isMobile]);
+
+  // Avoid multiple automatic requests while the next mobile page is loading.
+  const loadMoreReservations = useCallback(() => {
+    if (!isMobile || isLoadingMore || isLoadingPage || !hasNextPage) {
+      return;
+    }
+
+    loadReservations(currentPage + 1, { append: true });
+  }, [
+    isMobile,
+    isLoadingMore,
+    isLoadingPage,
+    hasNextPage,
+    currentPage,
+    loadReservations,
+  ]);
+
+  const handlePreviousPage = () => {
+    if (currentPage <= 1 || isLoadingPage) return;
+
+    loadReservations(currentPage - 1);
+  };
+
+  const handleNextPage = () => {
+    if (isLoadingPage || !hasNextPage) return;
+
+    loadReservations(currentPage + 1);
+  };
 
   const getSelectedMenuItems = (reservation) => {
     const selectedIds = reservation?.selected_menu_items ?? [];
@@ -116,20 +253,21 @@ const MyReservations = () => {
       setSelectedReservationCode((currentCode) =>
         currentCode === referenceCode ? null : currentCode,
       );
-    } catch (error) {
-      console.error("Failed to cancel reservation:", error);
+    } catch (requestError) {
+      console.error("Failed to cancel reservation:", requestError);
 
       setCancelError(
-        error.message || "Unable to cancel this reservation. Please try again.",
+        requestError.message ||
+          "Unable to cancel this reservation. Please try again.",
       );
     } finally {
       setIsCancelling(false);
     }
   };
+
   const renderPageTitle = () => (
     <div className="section-title">
       <h2>My Reservations</h2>
-
       <p>
         <span>Your</span>{" "}
         <span className="description-title">Reservations</span>
@@ -142,12 +280,10 @@ const MyReservations = () => {
       <section id="my-reservations" className="my-reservations section">
         <div className="container">
           {renderPageTitle()}
-
           <div className="my-reservations-state">
             <div className="spinner-border" role="status">
               <span className="visually-hidden">Loading...</span>
             </div>
-
             <p>Loading your reservations...</p>
           </div>
         </div>
@@ -160,7 +296,6 @@ const MyReservations = () => {
       <section id="my-reservations" className="my-reservations section">
         <div className="container">
           {renderPageTitle()}
-
           <div className="alert alert-danger" role="alert">
             <i className="bi bi-exclamation-circle me-2" />
             {error}
@@ -175,12 +310,10 @@ const MyReservations = () => {
       <section id="my-reservations" className="my-reservations section">
         <div className="container">
           {renderPageTitle()}
-
           <div className="my-reservations-empty">
             <div className="my-reservations-empty-icon">
               <i className="bi bi-calendar-x" />
             </div>
-
             <h3>No Reservations Yet</h3>
             <p>You don't have any reservations yet.</p>
           </div>
@@ -188,6 +321,8 @@ const MyReservations = () => {
       </section>
     );
   }
+
+  const totalPages = Math.ceil(totalCount / pageSize);
 
   return (
     <section id="my-reservations" className="my-reservations section">
@@ -201,6 +336,10 @@ const MyReservations = () => {
             onCancel={handleCancel}
             onSelect={setSelectedReservationCode}
             getSelectedMenuItems={getSelectedMenuItems}
+            totalCount={totalCount}
+            hasNextPage={hasNextPage}
+            isLoadingMore={isLoadingMore}
+            onLoadMore={loadMoreReservations}
           />
         ) : (
           <ReservationTable
@@ -209,6 +348,11 @@ const MyReservations = () => {
             onCancel={handleCancel}
             onSelect={setSelectedReservationCode}
             getSelectedMenuItems={getSelectedMenuItems}
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPreviousPage={handlePreviousPage}
+            onNextPage={handleNextPage}
+            isLoadingPage={isLoadingPage}
           />
         )}
       </div>
@@ -216,7 +360,9 @@ const MyReservations = () => {
       <ReservationDetailsModal
         reservation={selectedReservation}
         selectedItems={
-          selectedReservation ? getSelectedMenuItems(selectedReservation) : []
+          selectedReservation
+            ? getSelectedMenuItems(selectedReservation)
+            : []
         }
         isCancelling={isCancelling}
         onClose={() => setSelectedReservationCode(null)}

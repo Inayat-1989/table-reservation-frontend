@@ -1,22 +1,25 @@
+
 import { useEffect, useState } from "react";
 
 import {
   cancelReservation,
   resendReservationOtp,
   verifyReservationOtp,
+  getReservationOtpExpiry,
 } from "../../api/reservationApi";
 
 import ConfirmActionModal from "../common/ConfirmActionModal";
 
 import "../../assets/css/MenuSelection.css";
 
-const VERIFICATION_DURATION = 15 * 60;
-
 const EmailVerification = ({ booking, onVerified, onCancelled }) => {
+  const reservationReference = booking?.reference_code;
+  const customerEmail = booking?.customer_email;
+
   const [otp, setOtp] = useState("");
-  const [remainingSeconds, setRemainingSeconds] = useState(
-    VERIFICATION_DURATION,
-  );
+  const [otpExpiresAt, setOtpExpiresAt] = useState(null);
+  const [remainingSeconds, setRemainingSeconds] = useState(0);
+  const [isLoadingExpiry, setIsLoadingExpiry] = useState(true);
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
 
   const [status, setStatus] = useState({
@@ -28,21 +31,76 @@ const EmailVerification = ({ booking, onVerified, onCancelled }) => {
     success: "",
   });
 
-  const reservationReference = booking?.reference_code;
-
-  const customerEmail = booking?.customer_email;
-
   /*
-   * The OTP should already have been generated and
-   * sent when the DRAFT was finalized.
+   * Fetch the actual OTP expiry from Django.
    *
-   * Therefore this component does NOT automatically
-   * send another OTP when it mounts.
+   * This does not send another OTP.
+   * It only retrieves the expiry of the existing OTP.
    */
-
   useEffect(() => {
+    let cancelled = false;
+
+    const loadOtpExpiry = async () => {
+      setIsLoadingExpiry(true);
+      setOtpExpiresAt(null);
+      setRemainingSeconds(0);
+
+      try {
+        if (!reservationReference) {
+          throw new Error("Reservation information is missing.");
+        }
+
+        const response = await getReservationOtpExpiry(
+          reservationReference,
+        );
+
+        if (cancelled) return;
+
+        const expiry = response?.expires_at
+          ? new Date(response.expires_at).getTime()
+          : NaN;
+
+        if (!Number.isFinite(expiry)) {
+          throw new Error(
+            "Unable to retrieve the verification code expiry time.",
+          );
+        }
+
+        setOtpExpiresAt(expiry);
+
+        setRemainingSeconds(
+          Math.max(0, Math.ceil((expiry - Date.now()) / 1000)),
+        );
+
+        setStatus((previousStatus) => ({
+          ...previousStatus,
+          error: "",
+        }));
+      } catch (error) {
+        if (cancelled) return;
+
+        console.error(
+          "Email Verification: Failed to load OTP expiry:",
+          error,
+        );
+
+        setOtpExpiresAt(null);
+        setRemainingSeconds(0);
+
+        setStatus((previousStatus) => ({
+          ...previousStatus,
+          error:
+            error.message ||
+            "Unable to load the verification code expiry.",
+        }));
+      } finally {
+        if (!cancelled) {
+          setIsLoadingExpiry(false);
+        }
+      }
+    };
+
     setOtp("");
-    setRemainingSeconds(VERIFICATION_DURATION);
 
     setStatus({
       loading: false,
@@ -52,41 +110,48 @@ const EmailVerification = ({ booking, onVerified, onCancelled }) => {
       error: "",
       success: "",
     });
+
+    loadOtpExpiry();
+
+    return () => {
+      cancelled = true;
+    };
   }, [reservationReference]);
 
   /*
-   * Countdown.
+   * Update the countdown using the absolute expiry timestamp.
+   *
+   * Refreshing the page will not restart the timer because
+   * the remaining time is calculated from the backend expiry.
    */
   useEffect(() => {
-    if (status.loading || remainingSeconds <= 0) {
-      return;
-    }
+    if (otpExpiresAt === null) return undefined;
 
-    const timer = setInterval(() => {
-      setRemainingSeconds((previousSeconds) => {
-        if (previousSeconds <= 1) {
-          clearInterval(timer);
-          return 0;
-        }
+    const updateCountdown = () => {
+      setRemainingSeconds(
+        Math.max(
+          0,
+          Math.ceil((otpExpiresAt - Date.now()) / 1000),
+        ),
+      );
+    };
 
-        return previousSeconds - 1;
-      });
-    }, 1000);
+    updateCountdown();
+
+    const timer = setInterval(updateCountdown, 1000);
 
     return () => {
       clearInterval(timer);
     };
-  }, [status.loading, remainingSeconds]);
+  }, [otpExpiresAt]);
 
   const formatTime = () => {
     const minutes = Math.floor(remainingSeconds / 60);
-
     const seconds = remainingSeconds % 60;
 
-    return `${String(minutes).padStart(
-      2,
-      "0",
-    )}:${String(seconds).padStart(2, "0")}`;
+    return `${String(minutes).padStart(2, "0")}:${String(
+      seconds,
+    ).padStart(2, "0")}`;
   };
 
   const handleOtpChange = (event) => {
@@ -128,10 +193,21 @@ const EmailVerification = ({ booking, onVerified, onCancelled }) => {
       return;
     }
 
+    if (isLoadingExpiry || otpExpiresAt === null) {
+      setStatus((previousStatus) => ({
+        ...previousStatus,
+        error:
+          "The verification expiry could not be confirmed. Please try again.",
+      }));
+
+      return;
+    }
+
     if (remainingSeconds <= 0) {
       setStatus((previousStatus) => ({
         ...previousStatus,
-        error: "The verification code has expired. Please request a new code.",
+        error:
+          "The verification code has expired. Please request a new code.",
       }));
 
       return;
@@ -153,9 +229,15 @@ const EmailVerification = ({ booking, onVerified, onCancelled }) => {
         error: "",
       }));
 
-      const reservation = await verifyReservationOtp(reservationReference, otp);
+      const reservation = await verifyReservationOtp(
+        reservationReference,
+        otp,
+      );
 
-      console.log("Email Verification : Confirmed Reservation:", reservation);
+      console.log(
+        "Email Verification: Confirmed Reservation:",
+        reservation,
+      );
 
       setStatus({
         loading: false,
@@ -167,12 +249,15 @@ const EmailVerification = ({ booking, onVerified, onCancelled }) => {
       });
 
       /*
-       * Django has already changed the
-       * reservation to CONFIRMED.
+       * Django has already changed the reservation
+       * to CONFIRMED.
        */
       onVerified(reservation);
     } catch (error) {
-      console.error("Email Verification : OTP verification failed:", error);
+      console.error(
+        "Email Verification: OTP verification failed:",
+        error,
+      );
 
       setStatus((previousStatus) => ({
         ...previousStatus,
@@ -183,6 +268,9 @@ const EmailVerification = ({ booking, onVerified, onCancelled }) => {
     }
   };
 
+  /*
+   * Resend OTP and retrieve the new expiry from Django.
+   */
   const handleResend = async () => {
     if (
       !reservationReference ||
@@ -207,7 +295,26 @@ const EmailVerification = ({ booking, onVerified, onCancelled }) => {
     try {
       await resendReservationOtp(reservationReference);
 
-      setRemainingSeconds(VERIFICATION_DURATION);
+      // Retrieve the expiry of the newly issued OTP.
+      const expiryResponse = await getReservationOtpExpiry(
+        reservationReference,
+      );
+
+      const expiry = expiryResponse?.expires_at
+        ? new Date(expiryResponse.expires_at).getTime()
+        : NaN;
+
+      if (!Number.isFinite(expiry)) {
+        throw new Error(
+          "The new code was requested, but its expiry could not be retrieved. Please refresh and try again.",
+        );
+      }
+
+      setOtpExpiresAt(expiry);
+
+      setRemainingSeconds(
+        Math.max(0, Math.ceil((expiry - Date.now()) / 1000)),
+      );
 
       setStatus({
         loading: false,
@@ -218,19 +325,24 @@ const EmailVerification = ({ booking, onVerified, onCancelled }) => {
         success: "A new verification code has been sent.",
       });
     } catch (error) {
-      console.error("Email Verification : Resend failed:", error);
+      console.error(
+        "Email Verification: Resend failed:",
+        error,
+      );
 
-      setStatus({
-        loading: false,
-        verifying: false,
+      setStatus((previousStatus) => ({
+        ...previousStatus,
         resending: false,
-        cancelling: false,
-        error: error.message || "Unable to resend verification code.",
+        error:
+          error.message || "Unable to resend verification code.",
         success: "",
-      });
+      }));
     }
   };
 
+  /*
+   * Open cancellation confirmation modal.
+   */
   const handleCancel = () => {
     if (
       !reservationReference ||
@@ -250,6 +362,9 @@ const EmailVerification = ({ booking, onVerified, onCancelled }) => {
     setIsCancelModalOpen(true);
   };
 
+  /*
+   * Confirm reservation cancellation.
+   */
   const confirmCancel = async () => {
     if (
       !reservationReference ||
@@ -268,26 +383,38 @@ const EmailVerification = ({ booking, onVerified, onCancelled }) => {
     }));
 
     try {
-      const response = await cancelReservation(reservationReference);
+      const response = await cancelReservation(
+        reservationReference,
+      );
 
-      console.log("Email Verification: Reservation cancelled:", response);
+      console.log(
+        "Email Verification: Reservation cancelled:",
+        response,
+      );
 
       setIsCancelModalOpen(false);
       onCancelled();
     } catch (error) {
-      console.error("Email Verification: Cancel failed:", error);
+      console.error(
+        "Email Verification: Cancel failed:",
+        error,
+      );
 
       setStatus((previousStatus) => ({
         ...previousStatus,
         cancelling: false,
-        error: error.message || "Unable to cancel the reservation.",
+        error:
+          error.message || "Unable to cancel the reservation.",
         success: "",
       }));
     }
   };
 
   return (
-    <section id="email-verification" className="email-verification section">
+    <section
+      id="email-verification"
+      className="email-verification section"
+    >
       <div className="container">
         <div className="section-title">
           <h2>Email Verification</h2>
@@ -310,7 +437,9 @@ const EmailVerification = ({ booking, onVerified, onCancelled }) => {
 
               <p>We have sent a 6-digit verification code to:</p>
 
-              <strong className="verification-email">{customerEmail}</strong>
+              <strong className="verification-email">
+                {customerEmail}
+              </strong>
 
               {status.error && !isCancelModalOpen && (
                 <div className="verification-error" role="alert">
@@ -342,8 +471,11 @@ const EmailVerification = ({ booking, onVerified, onCancelled }) => {
                     placeholder="000000"
                     className="form-control verification-otp-input"
                     disabled={
+                      isLoadingExpiry ||
                       status.verifying ||
                       status.cancelling ||
+                      status.resending ||
+                      otpExpiresAt === null ||
                       remainingSeconds <= 0
                     }
                   />
@@ -353,9 +485,16 @@ const EmailVerification = ({ booking, onVerified, onCancelled }) => {
                 <div className="verification-timer">
                   <i className="bi bi-clock me-2"></i>
 
-                  {remainingSeconds > 0 ? (
+                  {isLoadingExpiry ? (
+                    <strong>Loading expiry...</strong>
+                  ) : otpExpiresAt === null ? (
+                    <strong>
+                      Verification expiry unavailable
+                    </strong>
+                  ) : remainingSeconds > 0 ? (
                     <>
-                      Code expires in <strong>{formatTime()}</strong>
+                      Code expires in{" "}
+                      <strong>{formatTime()}</strong>
                     </>
                   ) : (
                     <strong>Verification code expired</strong>
@@ -367,8 +506,11 @@ const EmailVerification = ({ booking, onVerified, onCancelled }) => {
                   type="submit"
                   className="btn-get-started form-button"
                   disabled={
+                    isLoadingExpiry ||
+                    otpExpiresAt === null ||
                     status.verifying ||
                     status.cancelling ||
+                    status.resending ||
                     remainingSeconds <= 0 ||
                     otp.length !== 6
                   }
@@ -399,7 +541,10 @@ const EmailVerification = ({ booking, onVerified, onCancelled }) => {
                   onClick={handleResend}
                   className="verification-resend-button"
                   disabled={
-                    status.resending || status.verifying || status.cancelling
+                    isLoadingExpiry ||
+                    status.resending ||
+                    status.verifying ||
+                    status.cancelling
                   }
                 >
                   {status.resending ? "Sending..." : "Resend Code"}
@@ -413,7 +558,9 @@ const EmailVerification = ({ booking, onVerified, onCancelled }) => {
                   onClick={handleCancel}
                   className="verification-cancel-button"
                   disabled={
-                    status.cancelling || status.verifying || status.resending
+                    status.cancelling ||
+                    status.verifying ||
+                    status.resending
                   }
                 >
                   {status.cancelling ? (

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef, useLayoutEffect } from "react";
 
 import { getActiveReservation } from "../../api/reservationApi";
 
@@ -11,6 +11,8 @@ const BookingFlow = () => {
   const [step, setStep] = useState("details");
   const [booking, setBooking] = useState(null);
   const [isRestoring, setIsRestoring] = useState(true);
+  const bookingFlowRef = useRef(null);
+const previousStepRef = useRef(null);
 
   useEffect(() => {
     const restoreBooking = async () => {
@@ -57,6 +59,38 @@ const BookingFlow = () => {
     restoreBooking();
   }, []);
 
+  useLayoutEffect(() => {
+    // Don't scroll while restoring the booking from the API.
+    if (isRestoring) return;
+
+    // Skip the initial render; only handle actual step transitions.
+    if (previousStepRef.current === null) {
+      previousStepRef.current = step;
+      return;
+    }
+
+    if (previousStepRef.current === step) return;
+
+    previousStepRef.current = step;
+
+    const element = bookingFlowRef.current;
+    if (!element) return;
+
+    const headerHeight =
+      document.getElementById("header")?.offsetHeight ?? 0;
+
+    const targetY =
+      element.getBoundingClientRect().top +
+      window.scrollY -
+      headerHeight -
+      16;
+
+    window.scrollTo({
+      top: Math.max(0, targetY),
+      behavior: "smooth",
+    });
+  }, [step, isRestoring]);
+
   const handleBookingSubmit = (reservation) => {
     setBooking(reservation);
 
@@ -90,7 +124,7 @@ const BookingFlow = () => {
   };
 
   return (
-    <div id="book-a-table">
+    <div id="book-a-table" ref={bookingFlowRef}>
       {isRestoring ? (
         <div className="container py-5 text-center" role="status">
           <p>Restoring your booking...</p>
