@@ -43,7 +43,7 @@ dashboard metrics.
 -   [Build and deployment](#build-and-deployment)
 -   [Troubleshooting](#troubleshooting)
 -   [Quality checklist](#quality-checklist)
--   [Quality checklist](#compose-yaml-details)
+-   [Compose YAML Details](#compose-yaml-details)
 
 ## Technology stack
 
