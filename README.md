@@ -586,73 +586,72 @@ client-side routes while routing API paths to Django.
 
 ## Compose YAML Details
 
+    services:
+    frontend:
+        build:
+        context: ./frontend
+        dockerfile: Dockerfile
+        ports:
+        - "5173:5173"
+        environment:
+        VITE_API_BASE_URL: /api/v1
+        CHOKIDAR_USEPOLLING: "true"
 
-services:
-  frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-    ports:
-      - "5173:5173"
-    environment:
-      VITE_API_BASE_URL: /api/v1
-      CHOKIDAR_USEPOLLING: "true"
+        volumes:
+        - type: bind
+            source: ./frontend
+            target: /app
+        - type: volume
+            source: frontend_node_modules
+            target: /app/node_modules
+        depends_on:
+        - backend
+
+    backend:
+        build:
+        context: ./backend
+        dockerfile: Dockerfile
+        env_file:
+        - ./backend/.env
+        ports:
+        - "8000:8000"
+        volumes:
+        - type: bind
+            source: ./backend
+            target: /app
+        command: >
+        sh -c "python manage.py migrate &&
+                python manage.py runserver 0.0.0.0:8000"
+        depends_on:
+        redis:
+            condition: service_healthy
+
+    celery:
+        build:
+        context: ./backend
+        dockerfile: Dockerfile
+        env_file:
+        - ./backend/.env
+        volumes:
+        - type: bind
+            source: ./backend
+            target: /app
+        command: celery -A config worker --loglevel=info
+        depends_on:
+        redis:
+            condition: service_healthy
+
+    redis:
+        image: redis:7-alpine
+        command: redis-server --appendonly yes
+        volumes:
+        - redis_data:/data
+        healthcheck:
+        test: ["CMD", "redis-cli", "ping"]
+        interval: 5s
+        timeout: 3s
+        retries: 10
 
     volumes:
-      - type: bind
-        source: ./frontend
-        target: /app
-      - type: volume
-        source: frontend_node_modules
-        target: /app/node_modules
-    depends_on:
-      - backend
-
-  backend:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-    env_file:
-      - ./backend/.env
-    ports:
-      - "8000:8000"
-    volumes:
-      - type: bind
-        source: ./backend
-        target: /app
-    command: >
-      sh -c "python manage.py migrate &&
-             python manage.py runserver 0.0.0.0:8000"
-    depends_on:
-      redis:
-        condition: service_healthy
-
-  celery:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-    env_file:
-      - ./backend/.env
-    volumes:
-      - type: bind
-        source: ./backend
-        target: /app
-    command: celery -A config worker --loglevel=info
-    depends_on:
-      redis:
-        condition: service_healthy
-
-  redis:
-    image: redis:7-alpine
-    command: redis-server --appendonly yes
-    volumes:
-      - redis_data:/data
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 5s
-      timeout: 3s
-      retries: 10
-
-volumes:
-  frontend_node_modules:
-  redis_data:
+    frontend_node_modules:
+    redis_data:
