@@ -1,49 +1,47 @@
-import "../../assets/css/BookingSuccess.css";
+import '../../assets/css/BookingSuccess.css';
 
-import { menuItemsData } from "../../services/menu-items";
+import { menuItemsData } from '../../services/menu-items';
 
 const BookingSuccess = ({ booking, onBookAnother }) => {
   const formatDate = (dateValue) => {
     if (!dateValue) {
-      return "Not provided";
+      return 'Not provided';
     }
 
     const date = new Date(dateValue);
 
     if (Number.isNaN(date.getTime())) {
-      return "Not provided";
+      return 'Not provided';
     }
 
-    return date.toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
     });
   };
 
   const formatTime = (dateValue) => {
     if (!dateValue) {
-      return "Not provided";
+      return 'Not provided';
     }
 
     const date = new Date(dateValue);
 
     if (Number.isNaN(date.getTime())) {
-      return "Not provided";
+      return 'Not provided';
     }
 
-    return date.toLocaleTimeString("en-US", {
-      hour: "numeric",
-      minute: "2-digit",
+    return date.toLocaleTimeString('en-US', {
+      hour: 'numeric',
+      minute: '2-digit',
       hour12: true,
     });
   };
 
   const selectedMenuItemIds = booking?.selected_menu_items ?? [];
 
-  const selectedItems = menuItemsData.filter((item) =>
-    selectedMenuItemIds.includes(item.id),
-  );
+  const selectedItems = menuItemsData.filter((item) => selectedMenuItemIds.includes(item.id));
 
   const guestCount = Number(booking?.guest_count);
 
@@ -58,15 +56,13 @@ const BookingSuccess = ({ booking, onBookAnother }) => {
                 <i className="bi bi-check-lg"></i>
               </div>
 
-              <span className="booking-success-label">
-                Reservation Confirmed
-              </span>
+              <span className="booking-success-label">Reservation Confirmed</span>
 
               <h2>Thank You for Your Booking!</h2>
 
               <p className="booking-success-message">
-                Your email has been verified and your reservation is confirmed.
-                We look forward to welcoming you!
+                Your email has been verified and your reservation is confirmed. We look forward to
+                welcoming you!
               </p>
 
               {/* Reservation Reference */}
@@ -87,7 +83,7 @@ const BookingSuccess = ({ booking, onBookAnother }) => {
 
                   <div>
                     <span>Name</span>
-                    <strong>{booking?.customer_name || "Not provided"}</strong>
+                    <strong>{booking?.customer_name || 'Not provided'}</strong>
                   </div>
                 </div>
 
@@ -97,7 +93,7 @@ const BookingSuccess = ({ booking, onBookAnother }) => {
 
                   <div>
                     <span>Email</span>
-                    <strong>{booking?.customer_email || "Not provided"}</strong>
+                    <strong>{booking?.customer_email || 'Not provided'}</strong>
                   </div>
                 </div>
 
@@ -107,7 +103,7 @@ const BookingSuccess = ({ booking, onBookAnother }) => {
 
                   <div>
                     <span>Phone</span>
-                    <strong>{booking?.customer_phone || "Not provided"}</strong>
+                    <strong>{booking?.customer_phone || 'Not provided'}</strong>
                   </div>
                 </div>
 
@@ -140,10 +136,8 @@ const BookingSuccess = ({ booking, onBookAnother }) => {
 
                     <strong>
                       {Number.isFinite(guestCount) && guestCount > 0
-                        ? `${guestCount} ${
-                            guestCount === 1 ? "Person" : "People"
-                          }`
-                        : "Not provided"}
+                        ? `${guestCount} ${guestCount === 1 ? 'Person' : 'People'}`
+                        : 'Not provided'}
                     </strong>
                   </div>
                 </div>
@@ -181,8 +175,7 @@ const BookingSuccess = ({ booking, onBookAnother }) => {
               {/* Information Note */}
               <div className="booking-success-note">
                 <i className="bi bi-info-circle me-2"></i>
-                Please keep your reservation reference for future
-                correspondence.
+                Please keep your reservation reference for future correspondence.
               </div>
 
               {/* Make Another Reservation */}

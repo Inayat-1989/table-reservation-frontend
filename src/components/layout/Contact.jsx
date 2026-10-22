@@ -1,17 +1,17 @@
-import { useState } from "react";
+import { useState } from 'react';
 
 const Contact = () => {
   const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    subject: "",
-    message: "",
+    name: '',
+    email: '',
+    subject: '',
+    message: '',
   });
 
   const [status, setStatus] = useState({
     loading: false,
-    error: "",
-    success: "",
+    error: '',
+    success: '',
   });
 
   const handleChange = (event) => {
@@ -28,25 +28,25 @@ const Contact = () => {
 
     setStatus({
       loading: true,
-      error: "",
-      success: "",
+      error: '',
+      success: '',
     });
 
     // Backend/API connection will be added later.
-    console.log("Contact Form Data:", formData);
+    console.log('Contact Form Data:', formData);
 
     setTimeout(() => {
       setStatus({
         loading: false,
-        error: "",
-        success: "Your message has been sent. Thank you!",
+        error: '',
+        success: 'Your message has been sent. Thank you!',
       });
 
       setFormData({
-        name: "",
-        email: "",
-        subject: "",
-        message: "",
+        name: '',
+        email: '',
+        subject: '',
+        message: '',
       });
     }, 500);
   };
@@ -58,8 +58,7 @@ const Contact = () => {
         <h2>Contact</h2>
 
         <p>
-          <span>Need Help?</span>{" "}
-          <span className="description-title">Contact Us</span>
+          <span>Need Help?</span> <span className="description-title">Contact Us</span>
         </p>
       </div>
 
@@ -125,8 +124,7 @@ const Contact = () => {
                 </h3>
 
                 <p>
-                  <strong>Mon-Sat:</strong> 11AM - 23PM <strong>Sunday:</strong>{" "}
-                  Closed
+                  <strong>Mon-Sat:</strong> 11AM - 23PM <strong>Sunday:</strong> Closed
                 </p>
               </div>
             </div>
@@ -192,13 +190,9 @@ const Contact = () => {
             <div className="col-md-12 text-center">
               {status.loading && <div className="loading">Loading</div>}
 
-              {status.error && (
-                <div className="error-message">{status.error}</div>
-              )}
+              {status.error && <div className="error-message">{status.error}</div>}
 
-              {status.success && (
-                <div className="sent-message">{status.success}</div>
-              )}
+              {status.success && <div className="sent-message">{status.success}</div>}
 
               <button type="submit">Send Message</button>
             </div>

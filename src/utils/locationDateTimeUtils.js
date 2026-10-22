@@ -1,13 +1,13 @@
 const location = {
-  id: "Downtown",
-  name: "Downtown",
-  address: "100 Culinary Way, Suite 400",
-  phone: "+92 341 5054871",
-  status: "Open Now",
+  id: 'Downtown',
+  name: 'Downtown',
+  address: '100 Culinary Way, Suite 400',
+  phone: '+92 341 5054871',
+  status: 'Open Now',
   totalSeats: 48,
-  open: "10:30",
-  close: "22:00",
-  label: "11:00 AM – 10:00 PM",
+  open: '10:30',
+  close: '22:00',
+  label: '11:00 AM – 10:00 PM',
 };
 
 export const getToday = () => {
@@ -21,13 +21,13 @@ export const getToday = () => {
 export const getTimeNow = (condition) => {
   const now = new Date();
 
-  if (condition === "midnight") {
+  if (condition === 'midnight') {
     now.setHours(0, 0, 0, 0);
 
     return now;
   }
 
-  if (condition === "adjusted") {
+  if (condition === 'adjusted') {
     return adjustTime(now);
   }
 
@@ -52,12 +52,12 @@ export const adjustTime = (dateObj) => {
 
 export const parseValueFromDate = (date) => {
   if (!(date instanceof Date) || isNaN(date.getTime())) {
-    return "";
+    return '';
   }
 
   const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
 
   return `${year}-${month}-${day}`;
 };
@@ -67,7 +67,7 @@ export const parseDatefromValue = (date) => {
     return null;
   }
 
-  const [year, month, day] = date.split("-").map(Number);
+  const [year, month, day] = date.split('-').map(Number);
 
   return adjustTime(new Date(year, month - 1, day));
 };
@@ -76,11 +76,11 @@ export const formatDisplayTime = (dateObj) => {
   const hours = dateObj.getHours();
   const minutes = dateObj.getMinutes();
 
-  const period = hours >= 12 ? "PM" : "AM";
+  const period = hours >= 12 ? 'PM' : 'AM';
 
   const hours12 = hours % 12 === 0 ? 12 : hours % 12;
 
-  const pad2 = (number) => String(number).padStart(2, "0");
+  const pad2 = (number) => String(number).padStart(2, '0');
 
   return `${pad2(hours12)}:${pad2(minutes)} ${period}`;
 };
@@ -95,11 +95,11 @@ export const calculateAvailableTimeSlots = (selectedDate) => {
     return [];
   }
 
-  const now = getTimeNow("adjusted");
+  const now = getTimeNow('adjusted');
 
-  const [openHour, openMinute] = location.open.split(":").map(Number);
+  const [openHour, openMinute] = location.open.split(':').map(Number);
 
-  const [closeHour, closeMinute] = location.close.split(":").map(Number);
+  const [closeHour, closeMinute] = location.close.split(':').map(Number);
 
   const isToday =
     selectedDate.getFullYear() === now.getFullYear() &&
@@ -153,15 +153,11 @@ const get30MinList = (startDateTime, endDateTime) => {
 };
 
 export const isLessThan24HoursAway = (targetDate) => {
-  if (
-    !targetDate ||
-    !(targetDate instanceof Date) ||
-    isNaN(targetDate.getTime())
-  ) {
+  if (!targetDate || !(targetDate instanceof Date) || isNaN(targetDate.getTime())) {
     return false;
   }
 
-  const now = getTimeNow("adjusted");
+  const now = getTimeNow('adjusted');
 
   const difference = targetDate.getTime() - now.getTime();
 

@@ -1,43 +1,37 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState } from 'react';
 
 const EMPTY_FORM = {
-  title: "",
-  description: "",
-  category: "",
-  price: "",
-  src: "",
+  title: '',
+  description: '',
+  category: '',
+  price: '',
+  src: '',
   is_special: false,
   is_available: true,
 };
 
-export default function MenuItemForm({
-  item,
-  categories,
-  isSaving,
-  onSubmit,
-  onClose,
-}) {
+export default function MenuItemForm({ item, categories, isSaving, onSubmit, onClose }) {
   const [form, setForm] = useState(EMPTY_FORM);
-  const [formError, setFormError] = useState("");
+  const [formError, setFormError] = useState('');
 
   useEffect(() => {
     if (!item) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setForm(EMPTY_FORM);
-      setFormError("");
+      setFormError('');
       return;
     }
 
     setForm({
-      title: item.title ?? "",
-      description: item.description ?? "",
-      category: item.category?.id ?? item.category ?? "",
-      price: item.price ?? "",
-      src: item.src ?? "",
+      title: item.title ?? '',
+      description: item.description ?? '',
+      category: item.category?.id ?? item.category ?? '',
+      price: item.price ?? '',
+      src: item.src ?? '',
       is_special: Boolean(item.is_special),
       is_available: item.is_available !== false,
     });
-    setFormError("");
+    setFormError('');
   }, [item]);
 
   function update(field, value) {
@@ -46,22 +40,18 @@ export default function MenuItemForm({
 
   async function handleSubmit(event) {
     event.preventDefault();
-    setFormError("");
+    setFormError('');
 
     if (!form.title.trim()) {
-      setFormError("Enter a title for this menu item.");
+      setFormError('Enter a title for this menu item.');
       return;
     }
-    if (
-      form.price === "" ||
-      !Number.isFinite(Number(form.price)) ||
-      Number(form.price) < 0
-    ) {
-      setFormError("Enter a valid non-negative price.");
+    if (form.price === '' || !Number.isFinite(Number(form.price)) || Number(form.price) < 0) {
+      setFormError('Enter a valid non-negative price.');
       return;
     }
     if (!form.category) {
-      setFormError("Select a category.");
+      setFormError('Select a category.');
       return;
     }
 
@@ -78,7 +68,7 @@ export default function MenuItemForm({
     try {
       await onSubmit(payload);
     } catch (error) {
-      setFormError(error.message || "Could not save this menu item.");
+      setFormError(error.message || 'Could not save this menu item.');
     }
   }
 
@@ -98,9 +88,7 @@ export default function MenuItemForm({
         <header className="menu-modal-header">
           <div>
             <span className="dashboard-eyebrow">MENU MANAGEMENT</span>
-            <h2 id="menu-item-form-title">
-              {item ? "Edit menu item" : "Add menu item"}
-            </h2>
+            <h2 id="menu-item-form-title">{item ? 'Edit menu item' : 'Add menu item'}</h2>
           </div>
           <button
             type="button"
@@ -118,7 +106,7 @@ export default function MenuItemForm({
             <span>Item title *</span>
             <input
               value={form.title}
-              onChange={(event) => update("title", event.target.value)}
+              onChange={(event) => update('title', event.target.value)}
               maxLength={150}
               required
             />
@@ -128,7 +116,7 @@ export default function MenuItemForm({
             <span>Category *</span>
             <select
               value={form.category}
-              onChange={(event) => update("category", event.target.value)}
+              onChange={(event) => update('category', event.target.value)}
               required
             >
               <option value="">Select a category</option>
@@ -149,7 +137,7 @@ export default function MenuItemForm({
               min="0"
               step="0.01"
               value={form.price}
-              onChange={(event) => update("price", event.target.value)}
+              onChange={(event) => update('price', event.target.value)}
               required
             />
           </label>
@@ -158,7 +146,7 @@ export default function MenuItemForm({
             <span>Image URL / path</span>
             <input
               value={form.src}
-              onChange={(event) => update("src", event.target.value)}
+              onChange={(event) => update('src', event.target.value)}
               placeholder="/media/menu/item.jpg or https://…"
             />
           </label>
@@ -168,7 +156,7 @@ export default function MenuItemForm({
             <textarea
               rows="3"
               value={form.description}
-              onChange={(event) => update("description", event.target.value)}
+              onChange={(event) => update('description', event.target.value)}
             />
           </label>
 
@@ -177,7 +165,7 @@ export default function MenuItemForm({
               <input
                 type="checkbox"
                 checked={form.is_special}
-                onChange={(event) => update("is_special", event.target.checked)}
+                onChange={(event) => update('is_special', event.target.checked)}
               />
               <span>Special item</span>
             </label>
@@ -185,9 +173,7 @@ export default function MenuItemForm({
               <input
                 type="checkbox"
                 checked={form.is_available}
-                onChange={(event) =>
-                  update("is_available", event.target.checked)
-                }
+                onChange={(event) => update('is_available', event.target.checked)}
               />
               <span>Available to customers</span>
             </label>
@@ -208,12 +194,8 @@ export default function MenuItemForm({
             >
               Cancel
             </button>
-            <button
-              type="submit"
-              className="dashboard-button"
-              disabled={isSaving}
-            >
-              {isSaving ? "Saving…" : item ? "Save changes" : "Create item"}
+            <button type="submit" className="dashboard-button" disabled={isSaving}>
+              {isSaving ? 'Saving…' : item ? 'Save changes' : 'Create item'}
             </button>
           </footer>
         </form>

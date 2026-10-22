@@ -4,7 +4,7 @@ import {
   getStatusClass,
   getStatusLabel,
   isCancellationDisabled,
-} from "./reservationUtils";
+} from './reservationUtils';
 
 const ReservationDetailsModal = ({
   reservation,
@@ -26,9 +26,7 @@ const ReservationDetailsModal = ({
       >
         <div className="reservation-modal-header">
           <div>
-            <span className="reservation-reference-label">
-              Reservation Reference
-            </span>
+            <span className="reservation-reference-label">Reservation Reference</span>
 
             <h3 id="reservation-modal-title">{reservation.reference_code}</h3>
           </div>
@@ -45,11 +43,7 @@ const ReservationDetailsModal = ({
 
         <div className="reservation-modal-body">
           <div className="reservation-modal-status">
-            <span
-              className={`reservation-status ${getStatusClass(
-                reservation.status,
-              )}`}
-            >
+            <span className={`reservation-status ${getStatusClass(reservation.status)}`}>
               {getStatusLabel(reservation.status)}
             </span>
           </div>
@@ -59,7 +53,7 @@ const ReservationDetailsModal = ({
               <i className="bi bi-person" />
               <div>
                 <span>Customer Name</span>
-                <strong>{reservation.customer_name || "Not provided"}</strong>
+                <strong>{reservation.customer_name || 'Not provided'}</strong>
               </div>
             </div>
 
@@ -67,7 +61,7 @@ const ReservationDetailsModal = ({
               <i className="bi bi-envelope" />
               <div>
                 <span>Email</span>
-                <strong>{reservation.customer_email || "Not provided"}</strong>
+                <strong>{reservation.customer_email || 'Not provided'}</strong>
               </div>
             </div>
 
@@ -75,7 +69,7 @@ const ReservationDetailsModal = ({
               <i className="bi bi-telephone" />
               <div>
                 <span>Phone</span>
-                <strong>{reservation.customer_phone || "Not provided"}</strong>
+                <strong>{reservation.customer_phone || 'Not provided'}</strong>
               </div>
             </div>
 
@@ -100,8 +94,8 @@ const ReservationDetailsModal = ({
               <div>
                 <span>Guests</span>
                 <strong>
-                  {reservation.guest_count}{" "}
-                  {Number(reservation.guest_count) === 1 ? "Person" : "People"}
+                  {reservation.guest_count}{' '}
+                  {Number(reservation.guest_count) === 1 ? 'Person' : 'People'}
                 </strong>
               </div>
             </div>
@@ -140,19 +134,13 @@ const ReservationDetailsModal = ({
                 Customer Note
               </h4>
 
-              <p className="reservation-modal-note">
-                {reservation.customer_note}
-              </p>
+              <p className="reservation-modal-note">{reservation.customer_note}</p>
             </div>
           )}
         </div>
 
         <div className="reservation-modal-footer">
-          <button
-            type="button"
-            className="reservation-modal-done"
-            onClick={onClose}
-          >
+          <button type="button" className="reservation-modal-done" onClick={onClose}>
             Close
           </button>
 
@@ -162,11 +150,11 @@ const ReservationDetailsModal = ({
             disabled={isCancellationDisabled(reservation, isCancelling)}
             onClick={() => onCancel(reservation.reference_code)}
           >
-            {reservation.status === "CANCELLED"
-              ? "Cancelled"
+            {reservation.status === 'CANCELLED'
+              ? 'Cancelled'
               : isCancelling
-                ? "Cancelling..."
-                : "Cancel Reservation"}
+                ? 'Cancelling...'
+                : 'Cancel Reservation'}
           </button>
         </div>
       </div>

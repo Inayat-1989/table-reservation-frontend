@@ -1,7 +1,7 @@
-import EmptyState from "./EmptyState";
-import SectionCard from "./SectionCard";
-import SummaryCard from "./SummaryCard";
-import { getSummaryCards } from "../../utils/dashboardFormatters";
+import { getSummaryCards } from '../../utils/dashboardFormatters';
+import EmptyState from './EmptyState';
+import SectionCard from './SectionCard';
+import SummaryCard from './SummaryCard';
 
 export default function SummaryCards({ summary }) {
   const cards = getSummaryCards(summary);

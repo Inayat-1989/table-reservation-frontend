@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState } from 'react';
 
-import "../../assets/css/TimeSlotPicker.css";
+import '../../assets/css/TimeSlotPicker.css';
 
 const TimeSlotPicker = ({
   selectedDate,
@@ -14,11 +14,7 @@ const TimeSlotPicker = ({
 
   if (!selectedDate) {
     return (
-      <button
-        type="button"
-        className="form-control text-start text-muted"
-        disabled
-      >
+      <button type="button" className="form-control text-start text-muted" disabled>
         <i className="bi bi-clock me-2"></i>
         Select a date first
       </button>
@@ -27,11 +23,7 @@ const TimeSlotPicker = ({
 
   if (isLoading) {
     return (
-      <button
-        type="button"
-        className="form-control text-start text-muted"
-        disabled
-      >
+      <button type="button" className="form-control text-start text-muted" disabled>
         <i className="bi bi-hourglass-split me-2"></i>
         Loading available times...
       </button>
@@ -40,11 +32,7 @@ const TimeSlotPicker = ({
 
   if (error) {
     return (
-      <button
-        type="button"
-        className="form-control text-start text-danger"
-        disabled
-      >
+      <button type="button" className="form-control text-start text-danger" disabled>
         <i className="bi bi-exclamation-circle me-2"></i>
         Unable to load times
       </button>
@@ -53,11 +41,7 @@ const TimeSlotPicker = ({
 
   if (availableSlots.length === 0) {
     return (
-      <button
-        type="button"
-        className="form-control text-start text-muted"
-        disabled
-      >
+      <button type="button" className="form-control text-start text-muted" disabled>
         <i className="bi bi-clock me-2"></i>
         No available times
       </button>
@@ -67,9 +51,9 @@ const TimeSlotPicker = ({
   const formatSlotTime = (startsAt) => {
     const date = new Date(startsAt);
 
-    return date.toLocaleTimeString("en-US", {
-      hour: "numeric",
-      minute: "2-digit",
+    return date.toLocaleTimeString('en-US', {
+      hour: 'numeric',
+      minute: '2-digit',
       hour12: true,
     });
   };
@@ -81,7 +65,6 @@ const TimeSlotPicker = ({
 
   return (
     <div className="time-picker">
-
       {/* Selected Time Button */}
       <button
         type="button"
@@ -90,44 +73,27 @@ const TimeSlotPicker = ({
       >
         <i className="bi bi-clock"></i>
 
-        <span>
-          {selectedSlot
-            ? formatSlotTime(selectedSlot.starts_at)
-            : "Select a time"}
-        </span>
+        <span>{selectedSlot ? formatSlotTime(selectedSlot.starts_at) : 'Select a time'}</span>
 
-        <i
-          className={`bi ms-auto ${
-            isOpen
-              ? "bi-chevron-up"
-              : "bi-chevron-down"
-          }`}
-        ></i>
+        <i className={`bi ms-auto ${isOpen ? 'bi-chevron-up' : 'bi-chevron-down'}`}></i>
       </button>
 
       {/* Time Slot Dropdown */}
       {isOpen && (
         <div className="time-picker-dropdown">
           {availableSlots.map((slot) => {
-            const isSelected =
-              selectedSlot?.id === slot.id;
+            const isSelected = selectedSlot?.id === slot.id;
 
             return (
               <button
                 key={slot.id}
                 type="button"
-                className={`time-picker-option ${
-                  isSelected ? "selected" : ""
-                }`}
+                className={`time-picker-option ${isSelected ? 'selected' : ''}`}
                 onClick={() => handleTimeSelect(slot)}
               >
-                <span>
-                  {formatSlotTime(slot.starts_at)}
-                </span>
+                <span>{formatSlotTime(slot.starts_at)}</span>
 
-                {isSelected && (
-                  <i className="bi bi-check2"></i>
-                )}
+                {isSelected && <i className="bi bi-check2"></i>}
               </button>
             );
           })}

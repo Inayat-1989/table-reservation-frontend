@@ -73,17 +73,16 @@ const Footer = () => {
       {/* Copyright */}
       <div className="container copyright text-center mt-4">
         <p>
-          © <span>Copyright</span>{" "}
-          <strong className="px-1 sitename">Yummy</strong>{" "}
+          © <span>Copyright</span> <strong className="px-1 sitename">Yummy</strong>{' '}
           <span>All Rights Reserved</span>
         </p>
 
         <div className="credits">
-          Designed by{" "}
+          Designed by{' '}
           <a href="https://bootstrapmade.com/" target="_blank" rel="noreferrer">
             Inayat Ullah
-          </a>{" "}
-          Distributed by{" "}
+          </a>{' '}
+          Distributed by{' '}
           <a href="https://themewagon.com" target="_blank" rel="noreferrer">
             Pinnacloid
           </a>

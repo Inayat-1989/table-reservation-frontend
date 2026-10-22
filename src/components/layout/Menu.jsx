@@ -1,11 +1,11 @@
-import { useState } from "react";
-import { menuItemsData, CATEGORIES } from "../../services/menu-items";
+import { useState } from 'react';
+import { CATEGORIES, menuItemsData } from '../../services/menu-items';
 
 const Menu = () => {
-  const [activeCategory, setActiveCategory] = useState("all");
+  const [activeCategory, setActiveCategory] = useState('all');
 
   const filteredItems =
-    activeCategory === "all"
+    activeCategory === 'all'
       ? menuItemsData
       : menuItemsData.filter((item) => item.category === activeCategory);
 
@@ -15,8 +15,7 @@ const Menu = () => {
       <div className="container section-title">
         <h2>Our Menu</h2>
         <p>
-          <span>Check Our</span>{" "}
-          <span className="description-title">Yummy Menu</span>
+          <span>Check Our</span> <span className="description-title">Yummy Menu</span>
         </p>
       </div>
 
@@ -27,9 +26,7 @@ const Menu = () => {
             <li className="nav-item" key={category.id}>
               <button
                 type="button"
-                className={`nav-link ${
-                  activeCategory === category.id ? "active" : ""
-                }`}
+                className={`nav-link ${activeCategory === category.id ? 'active' : ''}`}
                 onClick={() => setActiveCategory(category.id)}
               >
                 {category.label}
@@ -43,22 +40,13 @@ const Menu = () => {
           <div className="tab-pane fade show active">
             <div className="tab-header text-center">
               <p>Menu</p>
-              <h3>
-                {
-                  CATEGORIES.find((category) => category.id === activeCategory)
-                    ?.label
-                }
-              </h3>
+              <h3>{CATEGORIES.find((category) => category.id === activeCategory)?.label}</h3>
             </div>
 
             <div className="row gy-5">
               {filteredItems.map((item) => (
                 <div className="col-lg-4 menu-item" key={item.id}>
-                  <img
-                    src={item.src}
-                    className="menu-img menu-card-img"
-                    alt={item.title}
-                  />
+                  <img src={item.src} className="menu-img menu-card-img" alt={item.title} />
 
                   <h4>{item.title}</h4>
 
@@ -68,15 +56,11 @@ const Menu = () => {
 
                   {/* Optional availability / special indicators */}
                   {item.isSpecial && (
-                    <span className="badge bg-warning text-dark">
-                      Chef's Special
-                    </span>
+                    <span className="badge bg-warning text-dark">Chef's Special</span>
                   )}
 
                   {!item.isAvailable && (
-                    <span className="badge bg-secondary">
-                      Currently Unavailable
-                    </span>
+                    <span className="badge bg-secondary">Currently Unavailable</span>
                   )}
                 </div>
               ))}

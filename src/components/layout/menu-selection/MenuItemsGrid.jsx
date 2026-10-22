@@ -1,4 +1,4 @@
-import MenuItemCard from "./MenuItemCard";
+import MenuItemCard from './MenuItemCard';
 
 const MenuItemsGrid = ({ items, selectedItems, disabled, onToggle }) => {
   const selectedIds = new Set(selectedItems.map((item) => item.id));

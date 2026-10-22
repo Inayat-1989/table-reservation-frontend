@@ -1,32 +1,32 @@
-import chef1 from "../../assets/img/chefs/chefs-1.jpg";
-import chef2 from "../../assets/img/chefs/chefs-2.jpg";
-import chef3 from "../../assets/img/chefs/chefs-3.jpg";
+import chef1 from '../../assets/img/chefs/chefs-1.jpg';
+import chef2 from '../../assets/img/chefs/chefs-2.jpg';
+import chef3 from '../../assets/img/chefs/chefs-3.jpg';
 
 const Chefs = () => {
   const chefs = [
     {
       id: 1,
       image: chef1,
-      name: "Walter White",
-      role: "Master Chef",
+      name: 'Walter White',
+      role: 'Master Chef',
       description:
-        "Velit aut quia fugit et et. Dolorum ea voluptate vel tempore tenetur ipsa quae aut. Ipsum exercitationem iure minima enim corporis et voluptate.",
+        'Velit aut quia fugit et et. Dolorum ea voluptate vel tempore tenetur ipsa quae aut. Ipsum exercitationem iure minima enim corporis et voluptate.',
     },
     {
       id: 2,
       image: chef2,
-      name: "Sarah Jhonson",
-      role: "Patissier",
+      name: 'Sarah Jhonson',
+      role: 'Patissier',
       description:
-        "Quo esse repellendus quia id. Est eum et accusantium pariatur fugit nihil minima suscipit corporis. Voluptate sed quas reiciendis animi neque sapiente.",
+        'Quo esse repellendus quia id. Est eum et accusantium pariatur fugit nihil minima suscipit corporis. Voluptate sed quas reiciendis animi neque sapiente.',
     },
     {
       id: 3,
       image: chef3,
-      name: "William Anderson",
-      role: "Cook",
+      name: 'William Anderson',
+      role: 'Cook',
       description:
-        "Vero omnis enim consequatur. Voluptas consectetur unde qui molestiae deserunt. Voluptates enim aut architecto porro aspernatur molestiae modi.",
+        'Vero omnis enim consequatur. Voluptas consectetur unde qui molestiae deserunt. Voluptates enim aut architecto porro aspernatur molestiae modi.',
     },
   ];
 
@@ -37,7 +37,7 @@ const Chefs = () => {
         <h2>chefs</h2>
 
         <p>
-          <span>Our</span>{" "}
+          <span>Our</span>{' '}
           <span className="description-title">
             Proffesional Chefs
             <br />

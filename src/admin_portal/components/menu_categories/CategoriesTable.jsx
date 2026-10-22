@@ -1,13 +1,7 @@
-import CategoryStatus from "./CategoryStatus";
-import { formatCategoryDate } from "../../utils/menuCategoryFormatters";
+import { formatCategoryDate } from '../../utils/menuCategoryFormatters';
+import CategoryStatus from './CategoryStatus';
 
-export default function CategoriesTable({
-  categories,
-  onEdit,
-  onToggleStatus,
-  onDelete,
-  busyId,
-}) {
+export default function CategoriesTable({ categories, onEdit, onToggleStatus, onDelete, busyId }) {
   if (!categories.length) {
     return (
       <div className="mc-empty-state">
@@ -36,28 +30,23 @@ export default function CategoriesTable({
               <td>
                 <div className="mc-category-name">
                   <span className="mc-category-avatar">
-                    {(category.name || "?").trim().charAt(0).toUpperCase()}
+                    {(category.name || '?').trim().charAt(0).toUpperCase()}
                   </span>
                   <div>
-                    <strong>{category.name || "Untitled category"}</strong>
+                    <strong>{category.name || 'Untitled category'}</strong>
                     <small>ID: {category.id}</small>
                   </div>
                 </div>
               </td>
               <td>
-                <span
-                  className="mc-description"
-                  title={category.description || "No description"}
-                >
-                  {category.description?.trim() || "No description added"}
+                <span className="mc-description" title={category.description || 'No description'}>
+                  {category.description?.trim() || 'No description added'}
                 </span>
               </td>
               <td>
                 <CategoryStatus active={Boolean(category.is_active)} />
               </td>
-              <td className="mc-date">
-                {formatCategoryDate(category.created_at)}
-              </td>
+              <td className="mc-date">{formatCategoryDate(category.created_at)}</td>
               <td>
                 <div className="mc-row-actions">
                   <button
@@ -74,7 +63,7 @@ export default function CategoriesTable({
                     onClick={() => onToggleStatus(category)}
                     disabled={busyId === category.id}
                   >
-                    {category.is_active ? "Deactivate" : "Activate"}
+                    {category.is_active ? 'Deactivate' : 'Activate'}
                   </button>
                   <button
                     className="mc-action-button mc-action-danger"

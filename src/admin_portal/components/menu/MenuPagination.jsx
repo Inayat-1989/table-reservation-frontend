@@ -13,15 +13,15 @@ export default function MenuPagination({
   return (
     <div className="menu-pagination">
       <p>
-        Showing{" "}
+        Showing{' '}
         <strong>
           {first}–{last}
-        </strong>{" "}
+        </strong>{' '}
         of <strong>{count}</strong> items
       </p>
       <div className="menu-pagination-controls">
         <label>
-          Rows{" "}
+          Rows{' '}
           <select
             value={pageSize}
             disabled={disabled}

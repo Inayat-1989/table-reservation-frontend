@@ -1,12 +1,11 @@
-
 import {
   formatDate,
   formatTime,
+  getCancelButtonLabel,
   getStatusClass,
   getStatusLabel,
   isCancellationDisabled,
-  getCancelButtonLabel,
-} from "./reservationUtils";
+} from './reservationUtils';
 
 const ReservationTable = ({
   reservations,
@@ -26,8 +25,7 @@ const ReservationTable = ({
         <h3>Reservation History</h3>
 
         <span>
-          {reservations.length}{" "}
-          {reservations.length === 1 ? "reservation" : "reservations"}
+          {reservations.length} {reservations.length === 1 ? 'reservation' : 'reservations'}
         </span>
       </div>
 
@@ -47,9 +45,7 @@ const ReservationTable = ({
           <tbody>
             {reservations.map((reservation) => {
               const selectedItems = getSelectedMenuItems(reservation);
-              const hasSpecialItems = selectedItems.some(
-                (item) => item.isSpecial,
-              );
+              const hasSpecialItems = selectedItems.some((item) => item.isSpecial);
 
               return (
                 <tr
@@ -57,7 +53,7 @@ const ReservationTable = ({
                   className="reservation-table-row"
                   onClick={() => onSelect(reservation.reference_code)}
                   onKeyDown={(event) => {
-                    if (event.key === "Enter" || event.key === " ") {
+                    if (event.key === 'Enter' || event.key === ' ') {
                       event.preventDefault();
                       onSelect(reservation.reference_code);
                     }
@@ -66,9 +62,7 @@ const ReservationTable = ({
                   aria-label={`View reservation ${reservation.reference_code}`}
                 >
                   <td>
-                    <strong className="table-reference">
-                      {reservation.reference_code}
-                    </strong>
+                    <strong className="table-reference">{reservation.reference_code}</strong>
                   </td>
 
                   <td>
@@ -88,10 +82,8 @@ const ReservationTable = ({
                   <td>
                     <span className="table-guests">
                       <i className="bi bi-people" />
-                      {reservation.guest_count}{" "}
-                      {Number(reservation.guest_count) === 1
-                        ? "Guest"
-                        : "Guests"}
+                      {reservation.guest_count}{' '}
+                      {Number(reservation.guest_count) === 1 ? 'Guest' : 'Guests'}
                     </span>
                   </td>
 
@@ -107,11 +99,7 @@ const ReservationTable = ({
                   </td>
 
                   <td>
-                    <span
-                      className={`reservation-status ${getStatusClass(
-                        reservation.status,
-                      )}`}
-                    >
+                    <span className={`reservation-status ${getStatusClass(reservation.status)}`}>
                       {getStatusLabel(reservation.status)}
                     </span>
                   </td>
@@ -120,10 +108,7 @@ const ReservationTable = ({
                     <button
                       type="button"
                       className="reservation-cancel-button"
-                      disabled={isCancellationDisabled(
-                        reservation,
-                        isCancelling,
-                      )}
+                      disabled={isCancellationDisabled(reservation, isCancelling)}
                       onClick={(event) => {
                         event.stopPropagation();
                         onCancel(reservation.reference_code);

@@ -1,28 +1,28 @@
-import { Routes, Route, Navigate, Outlet } from "react-router-dom";
+import { Navigate, Outlet, Route, Routes } from 'react-router-dom';
 
-import About from "./components/layout/About";
-import Chefs from "./components/layout/Chefs";
-import Contact from "./components/layout/Contact";
-import Gallery from "./components/layout/Gallary";
-import Hero from "./components/layout/Hero";
-import Menu from "./components/layout/Menu";
-import MyReservations from "./components/layout/MyReservations";
-import BookingFlow from "./components/layout/BookingFlow";
+import About from './components/layout/About';
+import BookingFlow from './components/layout/BookingFlow';
+import Chefs from './components/layout/Chefs';
+import Contact from './components/layout/Contact';
+import Gallery from './components/layout/Gallary';
+import Hero from './components/layout/Hero';
+import Menu from './components/layout/Menu';
+import MyReservations from './components/layout/MyReservations';
 
-import Footer from "./components/navigation/Footer";
-import Header from "./components/navigation/Header";
+import Footer from './components/navigation/Footer';
+import Header from './components/navigation/Header';
 
-import AdminLayout from "./admin_portal/components/layout/AdminLayout";
-import AdminLoginPage from "./admin_portal/pages/LoginPage";
-import AdminOTPPage from "./admin_portal/pages/VerifyOTPPage";
-import AdminDashboardPage from "./admin_portal/pages/DashboardPage";
-import { AdminAuthProvider } from "./admin_portal/context/AdminAuthContext";
-import ReservationsPage from "./admin_portal/pages/ReservationsPage";
-import MenuItemsPage from "./admin_portal/pages/MenuItemsPage";
-import MenuCategoriesPage from "./admin_portal/pages/MenuCategoriesPage";
+import AdminLayout from './admin_portal/components/layout/AdminLayout';
+import { AdminAuthProvider } from './admin_portal/context/AdminAuthContext';
+import AdminDashboardPage from './admin_portal/pages/DashboardPage';
+import AdminLoginPage from './admin_portal/pages/LoginPage';
+import MenuCategoriesPage from './admin_portal/pages/MenuCategoriesPage';
+import MenuItemsPage from './admin_portal/pages/MenuItemsPage';
+import ReservationsPage from './admin_portal/pages/ReservationsPage';
+import AdminOTPPage from './admin_portal/pages/VerifyOTPPage';
 
-import "./admin_portal/styles/admin.css";
-import "./admin_portal/styles/reservations.css";
+import './admin_portal/styles/admin.css';
+import './admin_portal/styles/reservations.css';
 function HomePage() {
   return (
     <>

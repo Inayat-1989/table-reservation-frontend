@@ -1,19 +1,15 @@
-import { useCallback, useEffect, useState } from "react";
-import ReservationFilters from "../components/reservations/ReservationFilters";
-import ReservationsTable from "../components/reservations/ReservationsTable";
-import ReservationPagination from "../components/reservations/ReservationPagination";
-import ReservationDetails from "../components/reservations/ReservationDetails";
-import {
-  getAdminReservation,
-  getAdminReservations,
-} from "../services/reservationService";
+import { useCallback, useEffect, useState } from 'react';
+import ReservationDetails from '../components/reservations/ReservationDetails';
+import ReservationFilters from '../components/reservations/ReservationFilters';
+import ReservationPagination from '../components/reservations/ReservationPagination';
+import ReservationsTable from '../components/reservations/ReservationsTable';
+import { getAdminReservation, getAdminReservations } from '../services/reservationService';
 
-const EMPTY_FILTERS = { search: "", status: "", date_from: "", date_to: "" };
+const EMPTY_FILTERS = { search: '', status: '', date_from: '', date_to: '' };
 const EMPTY_LIST = { results: [], count: 0, next: null, previous: null };
 
 function normalizeList(data) {
-  if (Array.isArray(data))
-    return { results: data, count: data.length, next: null, previous: null };
+  if (Array.isArray(data)) return { results: data, count: data.length, next: null, previous: null };
   const results = data?.results ?? data?.reservations ?? [];
   return {
     results: Array.isArray(results) ? results : [],
@@ -30,13 +26,13 @@ export default function ReservationsPage() {
   const [pageSize, setPageSize] = useState(20);
   const [list, setList] = useState(EMPTY_LIST);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const [error, setError] = useState('');
   const [selected, setSelected] = useState(null);
-  const [detailsError, setDetailsError] = useState("");
+  const [detailsError, setDetailsError] = useState('');
 
   const load = useCallback(async () => {
     setLoading(true);
-    setError("");
+    setError('');
     try {
       const data = await getAdminReservations({
         ...appliedFilters,
@@ -45,7 +41,7 @@ export default function ReservationsPage() {
       });
       setList(normalizeList(data));
     } catch (err) {
-      setError(err.message || "Could not load reservations.");
+      setError(err.message || 'Could not load reservations.');
     } finally {
       setLoading(false);
     }
@@ -57,16 +53,12 @@ export default function ReservationsPage() {
   }, [load]);
 
   function applyFilters() {
-    if (
-      filters.date_from &&
-      filters.date_to &&
-      filters.date_from > filters.date_to
-    ) {
-      setError("The start date must be on or before the end date.");
+    if (filters.date_from && filters.date_to && filters.date_from > filters.date_to) {
+      setError('The start date must be on or before the end date.');
       return;
     }
     setPage(1);
-    setError("");
+    setError('');
     setAppliedFilters({ ...filters });
   }
 
@@ -74,17 +66,17 @@ export default function ReservationsPage() {
     setFilters(EMPTY_FILTERS);
     setAppliedFilters(EMPTY_FILTERS);
     setPage(1);
-    setError("");
+    setError('');
   }
 
   async function showDetails(row) {
     setSelected(row);
-    setDetailsError("");
+    setDetailsError('');
     try {
       const data = await getAdminReservation(row.reference_code);
       setSelected(data?.reservation ?? data?.data ?? data);
     } catch (err) {
-      setDetailsError(err.message || "Could not load reservation details.");
+      setDetailsError(err.message || 'Could not load reservation details.');
     }
   }
 
@@ -131,11 +123,7 @@ export default function ReservationsPage() {
             <p>{list.count.toLocaleString()} matching reservation(s)</p>
           </div>
         </div>
-        <ReservationsTable
-          reservations={list.results}
-          onSelect={showDetails}
-          isLoading={loading}
-        />
+        <ReservationsTable reservations={list.results} onSelect={showDetails} isLoading={loading} />
         <ReservationPagination
           count={list.count}
           page={page}
@@ -151,16 +139,11 @@ export default function ReservationsPage() {
         />
       </section>
 
-      {selected && (
-        <ReservationDetails
-          reservation={selected}
-          onClose={() => setSelected(null)}
-        />
-      )}
+      {selected && <ReservationDetails reservation={selected} onClose={() => setSelected(null)} />}
       {detailsError && (
         <div className="reservations-error" role="alert">
           {detailsError}
-          <button onClick={() => setDetailsError("")}>Dismiss</button>
+          <button onClick={() => setDetailsError('')}>Dismiss</button>
         </div>
       )}
     </div>

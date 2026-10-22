@@ -1,8 +1,8 @@
-import { createContext, useContext, useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { createContext, useContext, useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 
 // Adjust this import path to your existing API client.
-import { apiRequest, initializeCsrf } from "../../api/client";
+import { apiRequest, initializeCsrf } from '../../api/client';
 
 const AdminAuthContext = createContext(null);
 
@@ -18,7 +18,7 @@ export function AdminAuthProvider({ children }) {
     let cancelled = false;
 
     async function restoreSession() {
-      if (!location.pathname.startsWith("/admin_portal")) {
+      if (!location.pathname.startsWith('/admin_portal')) {
         setIsLoading(false);
         return;
       }
@@ -28,7 +28,7 @@ export function AdminAuthProvider({ children }) {
       try {
         await initializeCsrf();
 
-        const response = await apiRequest("/admin/me/");
+        const response = await apiRequest('/admin/me/');
 
         if (!cancelled) {
           setAdmin(response.admin ?? response);
@@ -57,8 +57,8 @@ export function AdminAuthProvider({ children }) {
   async function login(identifier, password) {
     await initializeCsrf();
 
-    const response = await apiRequest("/admin/login/", {
-      method: "POST",
+    const response = await apiRequest('/admin/login/', {
+      method: 'POST',
       body: JSON.stringify({
         identifier,
         password,
@@ -72,13 +72,11 @@ export function AdminAuthProvider({ children }) {
 
   async function verifyOTP(otp) {
     if (!challengeToken) {
-      throw new Error(
-        "Your login challenge has expired. Please sign in again.",
-      );
+      throw new Error('Your login challenge has expired. Please sign in again.');
     }
 
-    const response = await apiRequest("/admin/2fa/verify/", {
-      method: "POST",
+    const response = await apiRequest('/admin/2fa/verify/', {
+      method: 'POST',
       body: JSON.stringify({
         challenge_token: challengeToken,
         otp,
@@ -94,8 +92,8 @@ export function AdminAuthProvider({ children }) {
 
   async function logout() {
     try {
-      await apiRequest("/admin/logout/", {
-        method: "POST",
+      await apiRequest('/admin/logout/', {
+        method: 'POST',
       });
     } finally {
       setAdmin(null);
@@ -126,7 +124,7 @@ export function useAdminAuth() {
   const context = useContext(AdminAuthContext);
 
   if (!context) {
-    throw new Error("useAdminAuth must be used inside AdminAuthProvider.");
+    throw new Error('useAdminAuth must be used inside AdminAuthProvider.');
   }
 
   return context;

@@ -29,10 +29,7 @@ const MenuSelectionActions = ({
       >
         {isCancellingDraft ? (
           <>
-            <span
-              className="spinner-border spinner-border-sm me-2"
-              role="status"
-            />
+            <span className="spinner-border spinner-border-sm me-2" role="status" />
             Cancelling Draft...
           </>
         ) : (
@@ -51,10 +48,7 @@ const MenuSelectionActions = ({
       >
         {isSubmitting ? (
           <>
-            <span
-              className="spinner-border spinner-border-sm me-2"
-              role="status"
-            />
+            <span className="spinner-border spinner-border-sm me-2" role="status" />
             Confirming Reservation...
           </>
         ) : (

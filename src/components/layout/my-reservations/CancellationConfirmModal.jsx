@@ -1,12 +1,6 @@
-import "../../../assets/css/CancellationConfirmModal.css";
+import '../../../assets/css/CancellationConfirmModal.css';
 
-const CancellationConfirmModal = ({
-  reservation,
-  isCancelling,
-  error,
-  onConfirm,
-  onClose,
-}) => {
+const CancellationConfirmModal = ({ reservation, isCancelling, error, onConfirm, onClose }) => {
   if (!reservation) return null;
 
   return (
@@ -32,8 +26,7 @@ const CancellationConfirmModal = ({
         <h2 id="cancellation-modal-title">Cancel Reservation?</h2>
 
         <p id="cancellation-modal-description">
-          Are you sure you want to cancel this reservation? This action may not
-          be reversible.
+          Are you sure you want to cancel this reservation? This action may not be reversible.
         </p>
 
         <div className="cancellation-reservation-reference">

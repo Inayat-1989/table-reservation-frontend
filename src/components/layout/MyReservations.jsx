@@ -1,17 +1,14 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from 'react';
 
-import {
-  getReservations,
-  cancelReservation,
-} from "../../api/reservationApi";
+import { cancelReservation, getReservations } from '../../api/reservationApi';
 
-import { menuItemsData } from "../../services/menu-items";
+import { menuItemsData } from '../../services/menu-items';
 
-import ReservationTable from "./my-reservations/ReservationTable";
-import ReservationDetailsModal from "./my-reservations/ReservationDetailsModal";
-import MobileReservationCarousel from "./my-reservations/MobileReservationCarousel";
-import ConfirmActionModal from "../common/ConfirmActionModal";
-import "../../assets/css/MyReservations.css";
+import '../../assets/css/MyReservations.css';
+import ConfirmActionModal from '../common/ConfirmActionModal';
+import MobileReservationCarousel from './my-reservations/MobileReservationCarousel';
+import ReservationDetailsModal from './my-reservations/ReservationDetailsModal';
+import ReservationTable from './my-reservations/ReservationTable';
 
 const MyReservations = () => {
   const [reservations, setReservations] = useState([]);
@@ -20,13 +17,11 @@ const MyReservations = () => {
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [isCancelling, setIsCancelling] = useState(false);
 
-  const [cancelError, setCancelError] = useState("");
-  const [error, setError] = useState("");
+  const [cancelError, setCancelError] = useState('');
+  const [error, setError] = useState('');
 
-  const [selectedReservationCode, setSelectedReservationCode] =
-    useState(null);
-  const [pendingCancellationCode, setPendingCancellationCode] =
-    useState(null);
+  const [selectedReservationCode, setSelectedReservationCode] = useState(null);
+  const [pendingCancellationCode, setPendingCancellationCode] = useState(null);
 
   const [currentPage, setCurrentPage] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
@@ -34,33 +29,29 @@ const MyReservations = () => {
   const [hasNextPage, setHasNextPage] = useState(false);
 
   const [isMobile, setIsMobile] = useState(() =>
-    typeof window !== "undefined"
-      ? window.matchMedia("(max-width: 767px)").matches
-      : false,
+    typeof window !== 'undefined' ? window.matchMedia('(max-width: 767px)').matches : false,
   );
 
   useEffect(() => {
-    const mediaQuery = window.matchMedia("(max-width: 767px)");
+    const mediaQuery = window.matchMedia('(max-width: 767px)');
 
     const handleViewportChange = (event) => {
       setIsMobile(event.matches);
     };
 
-    mediaQuery.addEventListener("change", handleViewportChange);
+    mediaQuery.addEventListener('change', handleViewportChange);
 
     return () => {
-      mediaQuery.removeEventListener("change", handleViewportChange);
+      mediaQuery.removeEventListener('change', handleViewportChange);
     };
   }, []);
 
   const pendingReservation = reservations.find(
-    (reservation) =>
-      reservation.reference_code === pendingCancellationCode,
+    (reservation) => reservation.reference_code === pendingCancellationCode,
   );
 
   const selectedReservation = reservations.find(
-    (reservation) =>
-      reservation.reference_code === selectedReservationCode,
+    (reservation) => reservation.reference_code === selectedReservationCode,
   );
 
   const loadReservations = useCallback(
@@ -74,26 +65,20 @@ const MyReservations = () => {
           setIsLoadingPage(true);
         }
 
-        setError("");
+        setError('');
 
         const response = await getReservations(pageNumber);
 
-        const results = Array.isArray(response?.results)
-          ? response.results
-          : [];
+        const results = Array.isArray(response?.results) ? response.results : [];
 
         setReservations((previous) => {
           if (!append) return results;
 
-          const existingCodes = new Set(
-            previous.map((item) => item.reference_code),
-          );
+          const existingCodes = new Set(previous.map((item) => item.reference_code));
 
           return [
             ...previous,
-            ...results.filter(
-              (item) => !existingCodes.has(item.reference_code),
-            ),
+            ...results.filter((item) => !existingCodes.has(item.reference_code)),
           ];
         });
 
@@ -108,16 +93,12 @@ const MyReservations = () => {
 
         setHasNextPage(Boolean(response?.next));
       } catch (requestError) {
-        console.error(
-          "My Reservations: Failed to load reservations:",
-          requestError,
-        );
+        console.error('My Reservations: Failed to load reservations:', requestError);
 
         setError(
-          requestError.code === "SESSION_NOT_FOUND"
-            ? "No reservation session was found."
-            : requestError.message ||
-                "Unable to load your reservations. Please try again.",
+          requestError.code === 'SESSION_NOT_FOUND'
+            ? 'No reservation session was found.'
+            : requestError.message || 'Unable to load your reservations. Please try again.',
         );
       } finally {
         setIsLoading(false);
@@ -134,7 +115,7 @@ const MyReservations = () => {
 
     const loadInitialPage = async () => {
       setIsLoading(true);
-      setError("");
+      setError('');
       setCurrentPage(1);
       setTotalCount(0);
       setHasNextPage(false);
@@ -145,9 +126,7 @@ const MyReservations = () => {
 
         if (!active) return;
 
-        const results = Array.isArray(response?.results)
-          ? response.results
-          : [];
+        const results = Array.isArray(response?.results) ? response.results : [];
 
         setReservations(results);
         setCurrentPage(1);
@@ -163,16 +142,12 @@ const MyReservations = () => {
       } catch (requestError) {
         if (!active) return;
 
-        console.error(
-          "My Reservations: Failed to load reservations:",
-          requestError,
-        );
+        console.error('My Reservations: Failed to load reservations:', requestError);
 
         setError(
-          requestError.code === "SESSION_NOT_FOUND"
-            ? "No reservation session was found."
-            : requestError.message ||
-                "Unable to load your reservations. Please try again.",
+          requestError.code === 'SESSION_NOT_FOUND'
+            ? 'No reservation session was found.'
+            : requestError.message || 'Unable to load your reservations. Please try again.',
         );
       } finally {
         if (active) setIsLoading(false);
@@ -193,14 +168,7 @@ const MyReservations = () => {
     }
 
     loadReservations(currentPage + 1, { append: true });
-  }, [
-    isMobile,
-    isLoadingMore,
-    isLoadingPage,
-    hasNextPage,
-    currentPage,
-    loadReservations,
-  ]);
+  }, [isMobile, isLoadingMore, isLoadingPage, hasNextPage, currentPage, loadReservations]);
 
   const handlePreviousPage = () => {
     if (currentPage <= 1 || isLoadingPage) return;
@@ -217,15 +185,13 @@ const MyReservations = () => {
   const getSelectedMenuItems = (reservation) => {
     const selectedIds = reservation?.selected_menu_items ?? [];
 
-    return menuItemsData.filter(
-      (item) => selectedIds.includes(item.id) && item.isSpecial,
-    );
+    return menuItemsData.filter((item) => selectedIds.includes(item.id) && item.isSpecial);
   };
 
   const handleCancel = (referenceCode) => {
     if (isCancelling) return;
 
-    setCancelError("");
+    setCancelError('');
     setPendingCancellationCode(referenceCode);
   };
 
@@ -236,7 +202,7 @@ const MyReservations = () => {
 
     try {
       setIsCancelling(true);
-      setCancelError("");
+      setCancelError('');
 
       const updatedReservation = await cancelReservation(referenceCode);
 
@@ -254,11 +220,10 @@ const MyReservations = () => {
         currentCode === referenceCode ? null : currentCode,
       );
     } catch (requestError) {
-      console.error("Failed to cancel reservation:", requestError);
+      console.error('Failed to cancel reservation:', requestError);
 
       setCancelError(
-        requestError.message ||
-          "Unable to cancel this reservation. Please try again.",
+        requestError.message || 'Unable to cancel this reservation. Please try again.',
       );
     } finally {
       setIsCancelling(false);
@@ -269,8 +234,7 @@ const MyReservations = () => {
     <div className="section-title">
       <h2>My Reservations</h2>
       <p>
-        <span>Your</span>{" "}
-        <span className="description-title">Reservations</span>
+        <span>Your</span> <span className="description-title">Reservations</span>
       </p>
     </div>
   );
@@ -359,11 +323,7 @@ const MyReservations = () => {
 
       <ReservationDetailsModal
         reservation={selectedReservation}
-        selectedItems={
-          selectedReservation
-            ? getSelectedMenuItems(selectedReservation)
-            : []
-        }
+        selectedItems={selectedReservation ? getSelectedMenuItems(selectedReservation) : []}
         isCancelling={isCancelling}
         onClose={() => setSelectedReservationCode(null)}
         onCancel={handleCancel}
@@ -375,7 +335,7 @@ const MyReservations = () => {
         message={
           pendingReservation
             ? `Are you sure you want to cancel reservation ${pendingReservation.reference_code}? This action cannot be undone.`
-            : "Are you sure you want to cancel this reservation?"
+            : 'Are you sure you want to cancel this reservation?'
         }
         confirmText="Cancel Reservation"
         cancelText="Keep Reservation"
@@ -387,7 +347,7 @@ const MyReservations = () => {
           if (isCancelling) return;
 
           setPendingCancellationCode(null);
-          setCancelError("");
+          setCancelError('');
         }}
       />
     </section>

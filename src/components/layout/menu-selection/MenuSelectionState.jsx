@@ -39,8 +39,8 @@ const MenuSelectionState = ({
 
         <p className="mt-3">
           {!isSpecialMenuEligible
-            ? "Special menu items are not available for this reservation."
-            : "No special menu items are currently available."}
+            ? 'Special menu items are not available for this reservation.'
+            : 'No special menu items are currently available.'}
         </p>
       </div>
     );

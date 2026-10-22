@@ -1,26 +1,25 @@
-import { apiRequest } from "./client";
+import { apiRequest } from './client';
 
 export function getReservations(page = 1) {
   return apiRequest(`/reservations/?page=${page}`, {
-    method: "GET",
+    method: 'GET',
   });
 }
 
-
 export function getActiveReservation() {
-  return apiRequest("/reservations/active/");
+  return apiRequest('/reservations/active/');
 }
 
 export function createDraftReservation(bookingData) {
-  return apiRequest("/reservations/draft/", {
-    method: "POST",
+  return apiRequest('/reservations/draft/', {
+    method: 'POST',
     body: JSON.stringify(bookingData),
   });
 }
 
 export function updateDraftMenu(selectedMenuItemIds) {
-  return apiRequest("/reservations/draft/menu/", {
-    method: "PATCH",
+  return apiRequest('/reservations/draft/menu/', {
+    method: 'PATCH',
     body: JSON.stringify({
       selected_menu_item_ids: selectedMenuItemIds,
     }),
@@ -28,14 +27,14 @@ export function updateDraftMenu(selectedMenuItemIds) {
 }
 
 export function finalizeDraftReservation() {
-  return apiRequest("/reservations/draft/finalize/", {
-    method: "POST",
+  return apiRequest('/reservations/draft/finalize/', {
+    method: 'POST',
   });
 }
 
 export function verifyReservationOtp(referenceCode, otp) {
-  return apiRequest("/reservations/otp/verify/", {
-    method: "POST",
+  return apiRequest('/reservations/otp/verify/', {
+    method: 'POST',
     body: JSON.stringify({
       reference_code: referenceCode,
       otp,
@@ -44,8 +43,8 @@ export function verifyReservationOtp(referenceCode, otp) {
 }
 
 export function resendReservationOtp(referenceCode) {
-  return apiRequest("/reservations/otp/resend/", {
-    method: "POST",
+  return apiRequest('/reservations/otp/resend/', {
+    method: 'POST',
     body: JSON.stringify({
       reference_code: referenceCode,
     }),
@@ -54,7 +53,7 @@ export function resendReservationOtp(referenceCode) {
 
 export function cancelReservation(referenceCode) {
   return apiRequest(`/reservations/${referenceCode}/cancel/`, {
-    method: "POST",
+    method: 'POST',
   });
 }
 
@@ -63,16 +62,13 @@ export function getAvailableMenu() {
 }
 
 export function cancelDraftReservation() {
-  return apiRequest("/reservations/draft/cancel/", {
-    method: "POST",
+  return apiRequest('/reservations/draft/cancel/', {
+    method: 'POST',
   });
 }
 
 export async function getReservationOtpExpiry(referenceCode) {
-  return apiRequest(
-    `/reservations/${referenceCode}/otp-expiry/`,
-    {
-      method: "GET",
-    }
-  );
+  return apiRequest(`/reservations/${referenceCode}/otp-expiry/`, {
+    method: 'GET',
+  });
 }

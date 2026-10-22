@@ -1,22 +1,15 @@
 const STATUSES = [
-  ["", "All statuses"],
-  ["DRAFT", "Draft"],
-  ["PENDING_VERIFICATION", "Pending verification"],
-  ["CONFIRMED", "Confirmed"],
-  ["CANCELLED", "Cancelled"],
-  ["COMPLETED", "Completed"],
-  ["EXPIRED", "Expired"],
+  ['', 'All statuses'],
+  ['DRAFT', 'Draft'],
+  ['PENDING_VERIFICATION', 'Pending verification'],
+  ['CONFIRMED', 'Confirmed'],
+  ['CANCELLED', 'Cancelled'],
+  ['COMPLETED', 'Completed'],
+  ['EXPIRED', 'Expired'],
 ];
 
-export default function ReservationFilters({
-  filters,
-  onChange,
-  onApply,
-  onReset,
-  isLoading,
-}) {
-  const update = (key, value) =>
-    onChange((current) => ({ ...current, [key]: value }));
+export default function ReservationFilters({ filters, onChange, onApply, onReset, isLoading }) {
+  const update = (key, value) => onChange((current) => ({ ...current, [key]: value }));
   return (
     <form
       className="reservation-filters"
@@ -30,16 +23,13 @@ export default function ReservationFilters({
         <input
           type="search"
           value={filters.search}
-          onChange={(e) => update("search", e.target.value)}
+          onChange={(e) => update('search', e.target.value)}
           placeholder="Name, email, phone, or reference"
         />
       </label>
       <label>
         <span>Status</span>
-        <select
-          value={filters.status}
-          onChange={(e) => update("status", e.target.value)}
-        >
+        <select value={filters.status} onChange={(e) => update('status', e.target.value)}>
           {STATUSES.map(([value, label]) => (
             <option key={value} value={value}>
               {label}
@@ -52,7 +42,7 @@ export default function ReservationFilters({
         <input
           type="date"
           value={filters.date_from}
-          onChange={(e) => update("date_from", e.target.value)}
+          onChange={(e) => update('date_from', e.target.value)}
         />
       </label>
       <label>
@@ -60,7 +50,7 @@ export default function ReservationFilters({
         <input
           type="date"
           value={filters.date_to}
-          onChange={(e) => update("date_to", e.target.value)}
+          onChange={(e) => update('date_to', e.target.value)}
         />
       </label>
       <div className="reservation-filter-actions">

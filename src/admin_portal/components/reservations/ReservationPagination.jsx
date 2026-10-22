@@ -13,15 +13,15 @@ export default function ReservationPagination({
   return (
     <div className="reservation-pagination">
       <p>
-        Showing{" "}
+        Showing{' '}
         <strong>
           {first}–{last}
-        </strong>{" "}
+        </strong>{' '}
         of <strong>{count}</strong>
       </p>
       <div className="reservation-pagination-controls">
         <label>
-          Rows{" "}
+          Rows{' '}
           <select
             value={pageSize}
             disabled={isLoading}

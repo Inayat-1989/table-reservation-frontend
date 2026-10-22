@@ -1,12 +1,12 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from 'react';
 
 import {
   getDashboardSummary,
-  getReservationTrends,
   getPeakHours,
+  getReservationTrends,
   getSlotPopularity,
   getTrendingFoodItems,
-} from "../services/dashboardService";
+} from '../services/dashboardService';
 
 export default function useAdminDashboard() {
   const [data, setData] = useState({
@@ -18,21 +18,20 @@ export default function useAdminDashboard() {
   });
 
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState("");
+  const [error, setError] = useState('');
 
   const loadDashboard = useCallback(async () => {
     setIsLoading(true);
-    setError("");
+    setError('');
 
     try {
-      const [summary, trends, peakHours, slotPopularity, trendingFoodItems] =
-        await Promise.all([
-          getDashboardSummary(),
-          getReservationTrends(),
-          getPeakHours(),
-          getSlotPopularity(),
-          getTrendingFoodItems(),
-        ]);
+      const [summary, trends, peakHours, slotPopularity, trendingFoodItems] = await Promise.all([
+        getDashboardSummary(),
+        getReservationTrends(),
+        getPeakHours(),
+        getSlotPopularity(),
+        getTrendingFoodItems(),
+      ]);
 
       setData({
         summary,
@@ -42,7 +41,7 @@ export default function useAdminDashboard() {
         trendingFoodItems,
       });
     } catch (err) {
-      setError(err.message || "Unable to load dashboard data.");
+      setError(err.message || 'Unable to load dashboard data.');
     } finally {
       setIsLoading(false);
     }

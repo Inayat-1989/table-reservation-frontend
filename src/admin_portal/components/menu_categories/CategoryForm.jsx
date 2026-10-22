@@ -1,23 +1,23 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState } from 'react';
 
-const EMPTY_FORM = { name: "", description: "", is_active: true };
+const EMPTY_FORM = { name: '', description: '', is_active: true };
 
 export default function CategoryForm({ category, saving, onClose, onSubmit }) {
   const [form, setForm] = useState(EMPTY_FORM);
-  const [validationError, setValidationError] = useState("");
+  const [validationError, setValidationError] = useState('');
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setForm(
       category
         ? {
-            name: category.name ?? "",
-            description: category.description ?? "",
+            name: category.name ?? '',
+            description: category.description ?? '',
             is_active: category.is_active ?? true,
           }
         : EMPTY_FORM,
     );
-    setValidationError("");
+    setValidationError('');
   }, [category]);
 
   function update(field, value) {
@@ -28,14 +28,14 @@ export default function CategoryForm({ category, saving, onClose, onSubmit }) {
     event.preventDefault();
     const name = form.name.trim();
     if (!name) {
-      setValidationError("Category name is required.");
+      setValidationError('Category name is required.');
       return;
     }
     if (name.length > 100) {
-      setValidationError("Category name must be 100 characters or fewer.");
+      setValidationError('Category name must be 100 characters or fewer.');
       return;
     }
-    setValidationError("");
+    setValidationError('');
     onSubmit({
       name,
       description: form.description.trim(),
@@ -51,21 +51,12 @@ export default function CategoryForm({ category, saving, onClose, onSubmit }) {
         if (event.target === event.currentTarget && !saving) onClose();
       }}
     >
-      <section
-        className="mc-modal"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="mc-form-title"
-      >
+      <section className="mc-modal" role="dialog" aria-modal="true" aria-labelledby="mc-form-title">
         <header className="mc-modal-header">
           <div>
             <p className="mc-eyebrow">MENU MANAGEMENT</p>
-            <h2 id="mc-form-title">
-              {category ? "Edit category" : "Create category"}
-            </h2>
-            <p className="mc-modal-subtitle">
-              Organize menu items into clear sections.
-            </p>
+            <h2 id="mc-form-title">{category ? 'Edit category' : 'Create category'}</h2>
+            <p className="mc-modal-subtitle">Organize menu items into clear sections.</p>
           </div>
           <button
             className="mc-icon-button"
@@ -92,7 +83,7 @@ export default function CategoryForm({ category, saving, onClose, onSubmit }) {
                 autoFocus
                 maxLength={100}
                 value={form.name}
-                onChange={(event) => update("name", event.target.value)}
+                onChange={(event) => update('name', event.target.value)}
                 placeholder="e.g. Main Course"
                 required
               />
@@ -104,22 +95,19 @@ export default function CategoryForm({ category, saving, onClose, onSubmit }) {
               <textarea
                 rows={4}
                 value={form.description}
-                onChange={(event) => update("description", event.target.value)}
+                onChange={(event) => update('description', event.target.value)}
                 placeholder="Briefly describe this menu category"
               />
             </label>
             <label className="mc-toggle-field">
               <span className="mc-toggle-copy">
                 <strong>Category is active</strong>
-                <small>
-                  Active categories can be offered when creating or editing menu
-                  items.
-                </small>
+                <small>Active categories can be offered when creating or editing menu items.</small>
               </span>
               <input
                 type="checkbox"
                 checked={Boolean(form.is_active)}
-                onChange={(event) => update("is_active", event.target.checked)}
+                onChange={(event) => update('is_active', event.target.checked)}
               />
             </label>
           </div>
@@ -132,16 +120,8 @@ export default function CategoryForm({ category, saving, onClose, onSubmit }) {
             >
               Cancel
             </button>
-            <button
-              className="mc-button mc-button-primary"
-              type="submit"
-              disabled={saving}
-            >
-              {saving
-                ? "Saving..."
-                : category
-                  ? "Save changes"
-                  : "Create category"}
+            <button className="mc-button mc-button-primary" type="submit" disabled={saving}>
+              {saving ? 'Saving...' : category ? 'Save changes' : 'Create category'}
             </button>
           </footer>
         </form>

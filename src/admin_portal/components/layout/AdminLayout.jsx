@@ -1,6 +1,6 @@
-import { Navigate, NavLink, Outlet, useNavigate } from "react-router-dom";
-import { useAdminAuth } from "../../context/AdminAuthContext";
-import { LoadingSpinner } from "../common/LoadingSpinner";
+import { Navigate, NavLink, Outlet, useNavigate } from 'react-router-dom';
+import { useAdminAuth } from '../../context/AdminAuthContext';
+import { LoadingSpinner } from '../common/LoadingSpinner';
 
 export default function AdminLayout() {
   const navigate = useNavigate();
@@ -10,7 +10,7 @@ export default function AdminLayout() {
     try {
       await logout();
     } finally {
-      navigate("/admin_portal/login", { replace: true });
+      navigate('/admin_portal/login', { replace: true });
     }
   }
 
@@ -48,11 +48,7 @@ export default function AdminLayout() {
           <span>Restaurant Management</span>
 
           <div className="admin-user">
-            <span>
-              {admin?.first_name + " " + admin?.last_name ||
-                admin?.username ||
-                "Admin"}
-            </span>
+            <span>{admin?.first_name + ' ' + admin?.last_name || admin?.username || 'Admin'}</span>
 
             <button type="button" onClick={handleLogout}>
               Logout

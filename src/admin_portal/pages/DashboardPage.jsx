@@ -1,13 +1,10 @@
-import useAdminDashboard from "../hooks/useAdminDashboard";
-import SectionCard from "../components/dashboard/SectionCard";
-import SimpleBarList from "../components/dashboard/SimpleBarList";
-import SummaryCards from "../components/dashboard/SummaryCards";
-import TrendChart from "../components/dashboard/TrendChart";
-import TrendingFoodList from "../components/dashboard/TrendingFoodList";
-import {
-  DashboardError,
-  DashboardLoading,
-} from "../components/dashboard/DashboardStatus";
+import { DashboardError, DashboardLoading } from '../components/dashboard/DashboardStatus';
+import SectionCard from '../components/dashboard/SectionCard';
+import SimpleBarList from '../components/dashboard/SimpleBarList';
+import SummaryCards from '../components/dashboard/SummaryCards';
+import TrendChart from '../components/dashboard/TrendChart';
+import TrendingFoodList from '../components/dashboard/TrendingFoodList';
+import useAdminDashboard from '../hooks/useAdminDashboard';
 
 export default function DashboardPage() {
   const {
@@ -51,10 +48,7 @@ export default function DashboardPage() {
           <TrendChart data={trends} />
         </SectionCard>
 
-        <SectionCard
-          title="Trending Food Items"
-          subtitle="Most selected special menu items"
-        >
+        <SectionCard title="Trending Food Items" subtitle="Most selected special menu items">
           <TrendingFoodList data={trendingFoodItems} />
         </SectionCard>
 
@@ -62,10 +56,7 @@ export default function DashboardPage() {
           <SimpleBarList data={peakHours} />
         </SectionCard>
 
-        <SectionCard
-          title="Popular Time Slots"
-          subtitle="Most popular reservation slots"
-        >
+        <SectionCard title="Popular Time Slots" subtitle="Most popular reservation slots">
           <SimpleBarList data={slotPopularity} />
         </SectionCard>
       </div>

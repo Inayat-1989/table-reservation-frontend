@@ -1,9 +1,9 @@
 function WhyUs() {
   return (
     <section id="why-us" className="why-us section light-background">
-      {" "}
+      {' '}
       <div className="container">
-        {" "}
+        {' '}
         <div className="row gy-4">
           {/* Why Box */}
           <div className="col-lg-4">
@@ -11,17 +11,15 @@ function WhyUs() {
               <h3>Why Choose Yummy</h3>
 
               <p>
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-                eiusmod tempor incididunt ut labore et dolore magna aliqua. Duis
-                aute irure dolor in reprehenderit Asperiores dolores sed et.
-                Tenetur quia eos. Autem tempore quibusdam vel necessitatibus
-                optio ad corporis.
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
+                incididunt ut labore et dolore magna aliqua. Duis aute irure dolor in reprehenderit
+                Asperiores dolores sed et. Tenetur quia eos. Autem tempore quibusdam vel
+                necessitatibus optio ad corporis.
               </p>
 
               <div className="text-center">
                 <a href="#" className="more-btn">
-                  <span>Learn More</span>{" "}
-                  <i className="bi bi-chevron-right"></i>
+                  <span>Learn More</span> <i className="bi bi-chevron-right"></i>
                 </a>
               </div>
             </div>
@@ -38,8 +36,8 @@ function WhyUs() {
                   <h4>Corporis voluptates officia eiusmod</h4>
 
                   <p>
-                    Consequuntur sunt aut quasi enim aliquam quae harum pariatur
-                    laboris nisi ut aliquip
+                    Consequuntur sunt aut quasi enim aliquam quae harum pariatur laboris nisi ut
+                    aliquip
                   </p>
                 </div>
               </div>
@@ -52,8 +50,8 @@ function WhyUs() {
                   <h4>Ullamco laboris ladore lore pan</h4>
 
                   <p>
-                    Excepteur sint occaecat cupidatat non proident, sunt in
-                    culpa qui officia deserunt
+                    Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia
+                    deserunt
                   </p>
                 </div>
               </div>
@@ -66,8 +64,7 @@ function WhyUs() {
                   <h4>Labore consequatur incidid dolore</h4>
 
                   <p>
-                    Aut suscipit aut cum nemo deleniti aut omnis. Doloribus ut
-                    maiores omnis facere
+                    Aut suscipit aut cum nemo deleniti aut omnis. Doloribus ut maiores omnis facere
                   </p>
                 </div>
               </div>

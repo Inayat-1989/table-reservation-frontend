@@ -1,15 +1,14 @@
-import { useState } from "react";
-import { Navigate, useNavigate } from "react-router-dom";
-import { useAdminAuth } from "../context/AdminAuthContext";
-import LoadingSpinner from "../components/common/LoadingSpinner";
+import { useState } from 'react';
+import { Navigate, useNavigate } from 'react-router-dom';
+import LoadingSpinner from '../components/common/LoadingSpinner';
+import { useAdminAuth } from '../context/AdminAuthContext';
 
 export default function VerifyOTPPage() {
   const navigate = useNavigate();
-  const { challengeToken, verifyOTP, isAuthenticated, isLoading } =
-    useAdminAuth();
+  const { challengeToken, verifyOTP, isAuthenticated, isLoading } = useAdminAuth();
 
-  const [otp, setOtp] = useState("");
-  const [error, setError] = useState("");
+  const [otp, setOtp] = useState('');
+  const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   if (isLoading) {
@@ -26,16 +25,14 @@ export default function VerifyOTPPage() {
 
   async function handleSubmit(event) {
     event.preventDefault();
-    setError("");
+    setError('');
     setIsSubmitting(true);
 
     try {
       await verifyOTP(otp);
-      navigate("/admin_portal", { replace: true });
+      navigate('/admin_portal', { replace: true });
     } catch (error) {
-      setError(
-        error.message || "Verification failed. Check the code and try again.",
-      );
+      setError(error.message || 'Verification failed. Check the code and try again.');
     } finally {
       setIsSubmitting(false);
     }
@@ -45,10 +42,7 @@ export default function VerifyOTPPage() {
     <main className="admin-auth-page">
       <section className="admin-auth-card">
         <h1>Verify Your Email</h1>
-        <p>
-          Enter the six-digit verification code sent to your registered email
-          address.
-        </p>
+        <p>Enter the six-digit verification code sent to your registered email address.</p>
 
         <form onSubmit={handleSubmit}>
           <div className="form-group">
@@ -62,9 +56,7 @@ export default function VerifyOTPPage() {
               minLength={6}
               maxLength={6}
               value={otp}
-              onChange={(event) =>
-                setOtp(event.target.value.replace(/\D/g, "").slice(0, 6))
-              }
+              onChange={(event) => setOtp(event.target.value.replace(/\D/g, '').slice(0, 6))}
               required
             />
           </div>
@@ -76,7 +68,7 @@ export default function VerifyOTPPage() {
           )}
 
           <button type="submit" disabled={isSubmitting || otp.length !== 6}>
-            {isSubmitting ? "Verifying..." : "Verify and Continue"}
+            {isSubmitting ? 'Verifying...' : 'Verify and Continue'}
           </button>
         </form>
       </section>

@@ -1,19 +1,11 @@
-import { formatPrice } from "../../utils/menuFormatters";
-import MenuItemStatus from "./MenuItemStatus";
-import { LoadingSpinner } from "../common/LoadingSpinner";
+import { formatPrice } from '../../utils/menuFormatters';
+import { LoadingSpinner } from '../common/LoadingSpinner';
+import MenuItemStatus from './MenuItemStatus';
 
 export default function MenuItemsTable({ items, isLoading, onEdit, onDelete }) {
   if (isLoading)
-    return (
-      <LoadingSpinner
-        message={"MMMM"}
-        size={"small"}
-        color={"success"}
-        fullPage={true}
-      />
-    );
-  if (!items.length)
-    return <div className="menu-table-message">No menu items found.</div>;
+    return <LoadingSpinner message={'MMMM'} size={'small'} color={'success'} fullPage={true} />;
+  if (!items.length) return <div className="menu-table-message">No menu items found.</div>;
 
   return (
     <div className="menu-table-wrap">
@@ -39,7 +31,7 @@ export default function MenuItemsTable({ items, isLoading, onEdit, onDelete }) {
                       alt=""
                       loading="lazy"
                       onError={(event) => {
-                        event.currentTarget.style.visibility = "hidden";
+                        event.currentTarget.style.visibility = 'hidden';
                       }}
                     />
                   ) : (
@@ -47,27 +39,23 @@ export default function MenuItemsTable({ items, isLoading, onEdit, onDelete }) {
                   )}
                   <div>
                     <strong>{item.title}</strong>
-                    <p>{item.description || "No description"}</p>
+                    <p>{item.description || 'No description'}</p>
                   </div>
                 </div>
               </td>
-              <td>{item.category_name ?? item.category?.name ?? "—"}</td>
+              <td>{item.category_name ?? item.category?.name ?? '—'}</td>
               <td className="menu-item-price">{formatPrice(item.price)}</td>
               <td>
                 <MenuItemStatus
                   active={Boolean(item.is_special)}
-                  label={item.is_special ? "Special" : "Regular"}
+                  label={item.is_special ? 'Special' : 'Regular'}
                 />
               </td>
               <td>
                 <MenuItemStatus
                   active={Boolean(item.is_available) && !item.is_deleted}
                   label={
-                    item.is_deleted
-                      ? "Deleted"
-                      : item.is_available
-                        ? "Available"
-                        : "Unavailable"
+                    item.is_deleted ? 'Deleted' : item.is_available ? 'Available' : 'Unavailable'
                   }
                 />
               </td>

@@ -1,17 +1,17 @@
 import {
-  formatReservationDateTime,
-  customerName,
   customerEmail,
+  customerName,
   customerPhone,
+  formatReservationDateTime,
   reservationSlot,
-} from "../../utils/reservationFormatters";
-import ReservationStatusBadge from "./ReservationStatusBadge";
+} from '../../utils/reservationFormatters';
+import ReservationStatusBadge from './ReservationStatusBadge';
 
 function Field({ label, children }) {
   return (
     <div className="reservation-detail">
       <span>{label}</span>
-      <strong>{children ?? "—"}</strong>
+      <strong>{children ?? '—'}</strong>
     </div>
   );
 }
@@ -39,11 +39,7 @@ export default function ReservationDetails({ reservation, onClose }) {
             <span className="dashboard-eyebrow">RESERVATION DETAILS</span>
             <h2 id="reservation-detail-title">{reservation.reference_code}</h2>
           </div>
-          <button
-            className="reservation-modal-close"
-            aria-label="Close"
-            onClick={onClose}
-          >
+          <button className="reservation-modal-close" aria-label="Close" onClick={onClose}>
             ×
           </button>
         </header>
@@ -59,23 +55,19 @@ export default function ReservationDetails({ reservation, onClose }) {
           <Field label="Reservation time">
             {formatReservationDateTime(reservationSlot(reservation))}
           </Field>
-          <Field label="Created">
-            {formatReservationDateTime(reservation.created_at)}
-          </Field>
+          <Field label="Created">{formatReservationDateTime(reservation.created_at)}</Field>
           <Field label="Special menu eligible">
             {reservation.special_menu_eligible == null
-              ? "—"
+              ? '—'
               : reservation.special_menu_eligible
-                ? "Yes"
-                : "No"}
+                ? 'Yes'
+                : 'No'}
           </Field>
-          <Field label="Expires">
-            {formatReservationDateTime(reservation.expires_at)}
-          </Field>
+          <Field label="Expires">{formatReservationDateTime(reservation.expires_at)}</Field>
         </div>
         <div className="reservation-detail-block">
           <h3>Customer note</h3>
-          <p>{reservation.customer_note || "No note provided."}</p>
+          <p>{reservation.customer_note || 'No note provided.'}</p>
         </div>
         <div className="reservation-detail-block">
           <h3>Selected menu items</h3>
@@ -83,7 +75,7 @@ export default function ReservationDetails({ reservation, onClose }) {
             <ul>
               {items.map((item, i) => (
                 <li key={i}>
-                  {typeof item === "object"
+                  {typeof item === 'object'
                     ? (item.title ?? item.name ?? JSON.stringify(item))
                     : String(item)}
                 </li>
@@ -94,9 +86,7 @@ export default function ReservationDetails({ reservation, onClose }) {
           )}
         </div>
         <footer className="reservation-details-footer">
-          <span>
-            Updated: {formatReservationDateTime(reservation.updated_at)}
-          </span>
+          <span>Updated: {formatReservationDateTime(reservation.updated_at)}</span>
           <button type="button" className="dashboard-button" onClick={onClose}>
             Close
           </button>

@@ -27,7 +27,7 @@
 }
 .menu-filters input,
 .menu-filters select,
-.menu-item-form input:not([type="checkbox"]),
+.menu-item-form input:not([type='checkbox']),
 .menu-item-form select,
 .menu-item-form textarea {
   width: 100%;

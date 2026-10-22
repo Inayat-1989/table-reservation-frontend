@@ -1,24 +1,16 @@
 import {
-  formatReservationDateTime,
-  customerName,
   customerEmail,
+  customerName,
+  formatReservationDateTime,
   reservationSlot,
-} from "../../utils/reservationFormatters";
-import LoadingSpinner from "../common/LoadingSpinner";
-import ReservationStatusBadge from "./ReservationStatusBadge";
+} from '../../utils/reservationFormatters';
+import LoadingSpinner from '../common/LoadingSpinner';
+import ReservationStatusBadge from './ReservationStatusBadge';
 
-export default function ReservationsTable({
-  reservations,
-  onSelect,
-  isLoading,
-}) {
+export default function ReservationsTable({ reservations, onSelect, isLoading }) {
   if (isLoading) return <LoadingSpinner />;
   if (!reservations.length)
-    return (
-      <div className="reservation-table-message">
-        No reservations match your filters.
-      </div>
-    );
+    return <div className="reservation-table-message">No reservations match your filters.</div>;
 
   return (
     <div className="reservations-table-wrap">
@@ -37,9 +29,7 @@ export default function ReservationsTable({
           {reservations.map((r, i) => (
             <tr key={r.reference_code ?? i}>
               <td>
-                <strong className="reservation-reference">
-                  {r.reference_code ?? "—"}
-                </strong>
+                <strong className="reservation-reference">{r.reference_code ?? '—'}</strong>
               </td>
               <td>
                 <div className="reservation-customer-cell">
@@ -48,7 +38,7 @@ export default function ReservationsTable({
                 </div>
               </td>
               <td>{formatReservationDateTime(reservationSlot(r))}</td>
-              <td>{r.guest_count ?? "—"}</td>
+              <td>{r.guest_count ?? '—'}</td>
               <td>
                 <ReservationStatusBadge status={r.status} />
               </td>

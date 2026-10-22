@@ -1,14 +1,14 @@
-import { apiRequest } from "../../api/client";
+import { apiRequest } from '../../api/client';
 
 function buildQuery(params = {}) {
   const query = new URLSearchParams();
   Object.entries(params).forEach(([key, value]) => {
-    if (value !== undefined && value !== null && String(value).trim() !== "") {
+    if (value !== undefined && value !== null && String(value).trim() !== '') {
       query.set(key, String(value).trim());
     }
   });
   const text = query.toString();
-  return text ? `?${text}` : "";
+  return text ? `?${text}` : '';
 }
 
 export function getMenuItems(params = {}) {
@@ -20,22 +20,22 @@ export function getMenuItem(id) {
 }
 
 export function createMenuItem(payload) {
-  return apiRequest("/admin/menu/items/", {
-    method: "POST",
+  return apiRequest('/admin/menu/items/', {
+    method: 'POST',
     body: JSON.stringify(payload),
   });
 }
 
 export function updateMenuItem(id, payload) {
   return apiRequest(`/admin/menu/items/${encodeURIComponent(id)}/`, {
-    method: "PATCH",
+    method: 'PATCH',
     body: JSON.stringify(payload),
   });
 }
 
 export function deleteMenuItem(id) {
   return apiRequest(`/admin/menu/items/${encodeURIComponent(id)}/`, {
-    method: "DELETE",
+    method: 'DELETE',
   });
 }
 

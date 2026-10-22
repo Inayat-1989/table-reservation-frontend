@@ -3,8 +3,8 @@ import {
   formatValue,
   getEntries,
   isPrimitive,
-} from "../../utils/dashboardFormatters";
-import EmptyState from "./EmptyState";
+} from '../../utils/dashboardFormatters';
+import EmptyState from './EmptyState';
 
 function getNumericValue(value, raw) {
   const candidate = isPrimitive(value)
@@ -19,15 +19,11 @@ function getNumericValue(value, raw) {
   return Number.isFinite(number) ? number : 0;
 }
 
-export default function SimpleBarList({
-  data,
-  emptyMessage = "No data available yet.",
-}) {
+export default function SimpleBarList({ data, emptyMessage = 'No data available yet.' }) {
   console.log(data);
   const entries = getEntries(data)
     .map(([label, value, raw]) => ({
-      label:
-        raw && typeof raw === "object" ? formatSlotLabel(raw) : String(label),
+      label: raw && typeof raw === 'object' ? formatSlotLabel(raw) : String(label),
       value: getNumericValue(value, raw),
     }))
     .filter((item) => item.label && item.value >= 0)
@@ -46,10 +42,7 @@ export default function SimpleBarList({
             <strong>{formatValue(item.value)}</strong>
           </div>
           <div className="dashboard-bar-track">
-            <div
-              className="dashboard-bar-fill"
-              style={{ width: `${(item.value / max) * 100}%` }}
-            />
+            <div className="dashboard-bar-fill" style={{ width: `${(item.value / max) * 100}%` }} />
           </div>
         </div>
       ))}

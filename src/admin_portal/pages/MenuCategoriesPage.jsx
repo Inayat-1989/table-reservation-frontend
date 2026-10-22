@@ -1,36 +1,36 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
-import CategoryFilters from "../components/menu_categories/CategoryFilters";
-import CategoryForm from "../components/menu_categories/CategoryForm";
-import CategoriesTable from "../components/menu_categories/CategoriesTable";
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import CategoriesTable from '../components/menu_categories/CategoriesTable';
+import CategoryFilters from '../components/menu_categories/CategoryFilters';
+import CategoryForm from '../components/menu_categories/CategoryForm';
 import {
   createMenuCategory,
   deleteMenuCategory,
   getMenuCategories,
   updateMenuCategory,
-} from "../services/menuCategoryService";
-import { normalizeCategories } from "../utils/menuCategoryFormatters";
-import "../styles/menu-categories.css";
+} from '../services/menuCategoryService';
+import '../styles/menu-categories.css';
+import { normalizeCategories } from '../utils/menuCategoryFormatters';
 
 export default function MenuCategoriesPage() {
   const [categories, setCategories] = useState([]);
-  const [search, setSearch] = useState("");
-  const [status, setStatus] = useState("all");
+  const [search, setSearch] = useState('');
+  const [status, setStatus] = useState('all');
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [busyId, setBusyId] = useState(null);
-  const [error, setError] = useState("");
-  const [notice, setNotice] = useState("");
+  const [error, setError] = useState('');
+  const [notice, setNotice] = useState('');
   const [formOpen, setFormOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState(null);
 
   const loadCategories = useCallback(async () => {
     setLoading(true);
-    setError("");
+    setError('');
     try {
       const response = await getMenuCategories();
       setCategories(normalizeCategories(response));
     } catch (err) {
-      setError(err.message || "Could not load menu categories.");
+      setError(err.message || 'Could not load menu categories.');
     } finally {
       setLoading(false);
     }
@@ -47,20 +47,17 @@ export default function MenuCategoriesPage() {
       .filter((category) => {
         const matchesSearch =
           !query ||
-          [category.name, category.description, String(category.id ?? "")].some(
-            (value) =>
-              String(value ?? "")
-                .toLocaleLowerCase()
-                .includes(query),
+          [category.name, category.description, String(category.id ?? '')].some((value) =>
+            String(value ?? '')
+              .toLocaleLowerCase()
+              .includes(query),
           );
         const matchesStatus =
-          status === "all" ||
-          (status === "active"
-            ? Boolean(category.is_active)
-            : !category.is_active);
+          status === 'all' ||
+          (status === 'active' ? Boolean(category.is_active) : !category.is_active);
         return matchesSearch && matchesStatus;
       })
-      .sort((a, b) => String(a.name ?? "").localeCompare(String(b.name ?? "")));
+      .sort((a, b) => String(a.name ?? '').localeCompare(String(b.name ?? '')));
   }, [categories, search, status]);
 
   function openCreateForm() {
@@ -80,21 +77,21 @@ export default function MenuCategoriesPage() {
 
   async function saveCategory(payload) {
     setSaving(true);
-    setError("");
-    setNotice("");
+    setError('');
+    setNotice('');
     try {
       if (editingCategory) {
         await updateMenuCategory(editingCategory.id, payload);
-        setNotice("Category updated successfully.");
+        setNotice('Category updated successfully.');
       } else {
         await createMenuCategory(payload);
-        setNotice("Category created successfully.");
+        setNotice('Category created successfully.');
       }
       setFormOpen(false);
       setEditingCategory(null);
       await loadCategories();
     } catch (err) {
-      setError(err.message || "Could not save this category.");
+      setError(err.message || 'Could not save this category.');
     } finally {
       setSaving(false);
     }
@@ -102,19 +99,14 @@ export default function MenuCategoriesPage() {
 
   async function toggleStatus(category) {
     const nextActive = !category.is_active;
-    const action = nextActive ? "activate" : "deactivate";
-    if (
-      !window.confirm(`Are you sure you want to ${action} “${category.name}”?`)
-    )
-      return;
+    const action = nextActive ? 'activate' : 'deactivate';
+    if (!window.confirm(`Are you sure you want to ${action} “${category.name}”?`)) return;
     setBusyId(category.id);
-    setError("");
-    setNotice("");
+    setError('');
+    setNotice('');
     try {
       await updateMenuCategory(category.id, { is_active: nextActive });
-      setNotice(
-        `“${category.name}” is now ${nextActive ? "active" : "inactive"}.`,
-      );
+      setNotice(`“${category.name}” is now ${nextActive ? 'active' : 'inactive'}.`);
       await loadCategories();
     } catch (err) {
       setError(err.message || `Could not ${action} this category.`);
@@ -129,8 +121,8 @@ export default function MenuCategoriesPage() {
     );
     if (!confirmed) return;
     setBusyId(category.id);
-    setError("");
-    setNotice("");
+    setError('');
+    setNotice('');
     try {
       await deleteMenuCategory(category.id);
       setNotice(`“${category.name}” was deleted.`);
@@ -138,7 +130,7 @@ export default function MenuCategoriesPage() {
     } catch (err) {
       setError(
         err.message ||
-          "Could not delete this category. If it contains menu items, move those items to another category first.",
+          'Could not delete this category. If it contains menu items, move those items to another category first.',
       );
     } finally {
       setBusyId(null);
@@ -152,8 +144,7 @@ export default function MenuCategoriesPage() {
           <p className="mc-eyebrow">MENU MANAGEMENT</p>
           <h1>Menu Categories</h1>
           <p className="mc-page-subtitle">
-            Create and maintain the sections used to organize your restaurant
-            menu.
+            Create and maintain the sections used to organize your restaurant menu.
           </p>
         </div>
         <div className="mc-header-stat">
@@ -171,9 +162,7 @@ export default function MenuCategoriesPage() {
             <h2>All categories</h2>
             <p>Manage names, descriptions, and availability.</p>
           </div>
-          <span className="mc-count-pill">
-            {filteredCategories.length} shown
-          </span>
+          <span className="mc-count-pill">{filteredCategories.length} shown</span>
         </div>
         <CategoryFilters
           search={search}
@@ -186,11 +175,7 @@ export default function MenuCategoriesPage() {
           <div className="mc-alert mc-alert-success" role="status">
             <span>✓</span>
             {notice}
-            <button
-              type="button"
-              onClick={() => setNotice("")}
-              aria-label="Dismiss notification"
-            >
+            <button type="button" onClick={() => setNotice('')} aria-label="Dismiss notification">
               ×
             </button>
           </div>
@@ -199,11 +184,7 @@ export default function MenuCategoriesPage() {
           <div className="mc-alert mc-alert-error" role="alert">
             <span>!</span>
             {error}
-            <button
-              type="button"
-              onClick={() => setError("")}
-              aria-label="Dismiss error"
-            >
+            <button type="button" onClick={() => setError('')} aria-label="Dismiss error">
               ×
             </button>
           </div>
@@ -224,7 +205,7 @@ export default function MenuCategoriesPage() {
         )}
         {!loading && filteredCategories.length > 0 && (
           <footer className="mc-table-footer">
-            Showing <strong>{filteredCategories.length}</strong> of{" "}
+            Showing <strong>{filteredCategories.length}</strong> of{' '}
             <strong>{categories.length}</strong> categories
           </footer>
         )}

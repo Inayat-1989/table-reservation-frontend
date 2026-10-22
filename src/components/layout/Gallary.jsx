@@ -1,11 +1,11 @@
-import gallery1 from "../../assets/img/gallery/gallery-1.jpg";
-import gallery2 from "../../assets/img/gallery/gallery-2.jpg";
-import gallery3 from "../../assets/img/gallery/gallery-3.jpg";
-import gallery4 from "../../assets/img/gallery/gallery-4.jpg";
-import gallery5 from "../../assets/img/gallery/gallery-5.jpg";
-import gallery6 from "../../assets/img/gallery/gallery-6.jpg";
-import gallery7 from "../../assets/img/gallery/gallery-7.jpg";
-import gallery8 from "../../assets/img/gallery/gallery-8.jpg";
+import gallery1 from '../../assets/img/gallery/gallery-1.jpg';
+import gallery2 from '../../assets/img/gallery/gallery-2.jpg';
+import gallery3 from '../../assets/img/gallery/gallery-3.jpg';
+import gallery4 from '../../assets/img/gallery/gallery-4.jpg';
+import gallery5 from '../../assets/img/gallery/gallery-5.jpg';
+import gallery6 from '../../assets/img/gallery/gallery-6.jpg';
+import gallery7 from '../../assets/img/gallery/gallery-7.jpg';
+import gallery8 from '../../assets/img/gallery/gallery-8.jpg';
 
 const Gallery = () => {
   const galleryImages = [
@@ -50,8 +50,7 @@ const Gallery = () => {
         <h2>Gallery</h2>
 
         <p>
-          <span>Check</span>{" "}
-          <span className="description-title">Our Gallery</span>
+          <span>Check</span> <span className="description-title">Our Gallery</span>
         </p>
       </div>
 
@@ -59,16 +58,8 @@ const Gallery = () => {
         <div className="row gy-4">
           {galleryImages.map((item) => (
             <div className="col-xl-3 col-lg-4 col-md-6" key={item.id}>
-              <a
-                className="glightbox"
-                data-gallery="images-gallery"
-                href={item.image}
-              >
-                <img
-                  src={item.image}
-                  className="img-fluid"
-                  alt={`Gallery ${item.id}`}
-                />
+              <a className="glightbox" data-gallery="images-gallery" href={item.image}>
+                <img src={item.image} className="img-fluid" alt={`Gallery ${item.id}`} />
               </a>
             </div>
           ))}

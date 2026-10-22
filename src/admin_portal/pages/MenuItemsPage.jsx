@@ -1,20 +1,20 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
-import MenuItemFilters from "../components/menu/MenuItemFilters";
-import MenuItemForm from "../components/menu/MenuItemForm";
-import MenuItemsTable from "../components/menu/MenuItemsTable";
-import MenuPagination from "../components/menu/MenuPagination";
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import MenuItemFilters from '../components/menu/MenuItemFilters';
+import MenuItemForm from '../components/menu/MenuItemForm';
+import MenuItemsTable from '../components/menu/MenuItemsTable';
+import MenuPagination from '../components/menu/MenuPagination';
 import {
   createMenuItem,
   deleteMenuItem,
   getMenuCategories,
   getMenuItems,
   updateMenuItem,
-} from "../services/menuService";
-import { normalizeList } from "../utils/menuFormatters";
-import "../styles/menu-items.css";
+} from '../services/menuService';
+import '../styles/menu-items.css';
+import { normalizeList } from '../utils/menuFormatters';
 
 function getPageList(response) {
-  const results = normalizeList(response, "items");
+  const results = normalizeList(response, 'items');
   return {
     results,
     count: Number(response?.count ?? results.length),
@@ -31,21 +31,21 @@ export default function MenuItemsPage() {
     previous: null,
   });
   const [categories, setCategories] = useState([]);
-  const [search, setSearch] = useState("");
-  const [availability, setAvailability] = useState("all");
+  const [search, setSearch] = useState('');
+  const [availability, setAvailability] = useState('all');
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(20);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [error, setError] = useState("");
-  const [notice, setNotice] = useState("");
+  const [error, setError] = useState('');
+  const [notice, setNotice] = useState('');
   const [formItem, setFormItem] = useState(null);
   const [formOpen, setFormOpen] = useState(false);
-  const [searchApplied, setSearchApplied] = useState("");
+  const [searchApplied, setSearchApplied] = useState('');
 
   const loadData = useCallback(async () => {
     setLoading(true);
-    setError("");
+    setError('');
     try {
       const [itemsResponse, categoriesResponse] = await Promise.all([
         getMenuItems({ search: searchApplied, page, page_size: pageSize }),
@@ -54,9 +54,9 @@ export default function MenuItemsPage() {
       ]);
       const nextData = getPageList(itemsResponse);
       setItemsData(nextData);
-      setCategories(normalizeList(categoriesResponse, "categories"));
+      setCategories(normalizeList(categoriesResponse, 'categories'));
     } catch (requestError) {
-      setError(requestError.message || "Could not load menu items.");
+      setError(requestError.message || 'Could not load menu items.');
     } finally {
       setLoading(false);
     }
@@ -73,18 +73,12 @@ export default function MenuItemsPage() {
 
   const visibleItems = useMemo(() => {
     switch (availability) {
-      case "available":
-        return itemsData.results.filter(
-          (item) => item.is_available && !item.is_deleted,
-        );
-      case "unavailable":
-        return itemsData.results.filter(
-          (item) => !item.is_available && !item.is_deleted,
-        );
-      case "special":
-        return itemsData.results.filter(
-          (item) => item.is_special && !item.is_deleted,
-        );
+      case 'available':
+        return itemsData.results.filter((item) => item.is_available && !item.is_deleted);
+      case 'unavailable':
+        return itemsData.results.filter((item) => !item.is_available && !item.is_deleted);
+      case 'special':
+        return itemsData.results.filter((item) => item.is_special && !item.is_deleted);
       default:
         return itemsData.results;
     }
@@ -98,14 +92,14 @@ export default function MenuItemsPage() {
 
   async function saveItem(payload) {
     setSaving(true);
-    setError("");
+    setError('');
     try {
       if (formItem?.id) {
         await updateMenuItem(formItem.id, payload);
-        setNotice("Menu item updated successfully.");
+        setNotice('Menu item updated successfully.');
       } else {
         await createMenuItem(payload);
-        setNotice("Menu item created successfully.");
+        setNotice('Menu item created successfully.');
       }
       setFormOpen(false);
       setFormItem(null);
@@ -124,14 +118,14 @@ export default function MenuItemsPage() {
     );
     if (!confirmed) return;
 
-    setError("");
-    setNotice("");
+    setError('');
+    setNotice('');
     try {
       await deleteMenuItem(item.id);
       setNotice(`"${item.title}" was deleted.`);
       await loadData();
     } catch (requestError) {
-      setError(requestError.message || "Could not delete this menu item.");
+      setError(requestError.message || 'Could not delete this menu item.');
     }
   }
 
@@ -167,7 +161,7 @@ export default function MenuItemsPage() {
       {notice && (
         <div className="menu-feedback is-success" role="status">
           <span>{notice}</span>
-          <button onClick={() => setNotice("")} aria-label="Dismiss notice">
+          <button onClick={() => setNotice('')} aria-label="Dismiss notice">
             ×
           </button>
         </div>
@@ -177,9 +171,7 @@ export default function MenuItemsPage() {
         <div className="dashboard-panel-heading">
           <div>
             <h2>Menu catalogue</h2>
-            <p>
-              Search and filter items, then edit their details or availability.
-            </p>
+            <p>Search and filter items, then edit their details or availability.</p>
           </div>
         </div>
         <form className="menu-toolbar" onSubmit={applySearch}>

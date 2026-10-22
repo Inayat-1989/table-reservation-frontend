@@ -28,11 +28,7 @@ export default function CategoryFilters({
         <option value="active">Active only</option>
         <option value="inactive">Inactive only</option>
       </select>
-      <button
-        className="mc-button mc-button-primary"
-        type="button"
-        onClick={onCreate}
-      >
+      <button className="mc-button mc-button-primary" type="button" onClick={onCreate}>
         <span aria-hidden="true">＋</span> Add category
       </button>
     </div>

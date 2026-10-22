@@ -1,5 +1,5 @@
-import { getEntries, isPrimitive } from "../../utils/dashboardFormatters";
-import EmptyState from "./EmptyState";
+import { getEntries, isPrimitive } from '../../utils/dashboardFormatters';
+import EmptyState from './EmptyState';
 
 export default function TrendChart({ data }) {
   const entries = getEntries(data)
@@ -8,20 +8,14 @@ export default function TrendChart({ data }) {
       value: Number(
         isPrimitive(value)
           ? value
-          : (raw?.count ??
-              raw?.total ??
-              raw?.value ??
-              raw?.reservation_count ??
-              raw?.reservations),
+          : (raw?.count ?? raw?.total ?? raw?.value ?? raw?.reservation_count ?? raw?.reservations),
       ),
     }))
     .filter((item) => Number.isFinite(item.value))
     .slice(-12);
 
   if (!entries.length) {
-    return (
-      <EmptyState message="Reservation trend data is not available in a chartable format." />
-    );
+    return <EmptyState message="Reservation trend data is not available in a chartable format." />;
   }
 
   const width = 640;
@@ -35,16 +29,14 @@ export default function TrendChart({ data }) {
   const points = entries.map((item, index) => {
     const x =
       padding.left +
-      (entries.length === 1
-        ? chartWidth / 2
-        : (index / (entries.length - 1)) * chartWidth);
+      (entries.length === 1 ? chartWidth / 2 : (index / (entries.length - 1)) * chartWidth);
     const y = baseline - (item.value / maxValue) * chartHeight;
     return { ...item, x, y };
   });
 
   const linePath = points
-    .map((point, index) => `${index === 0 ? "M" : "L"} ${point.x} ${point.y}`)
-    .join(" ");
+    .map((point, index) => `${index === 0 ? 'M' : 'L'} ${point.x} ${point.y}`)
+    .join(' ');
   const areaPath = `${linePath} L ${points[points.length - 1].x} ${baseline} L ${points[0].x} ${baseline} Z`;
 
   return (
@@ -81,12 +73,7 @@ export default function TrendChart({ data }) {
         <path d={linePath} className="dashboard-chart-line" />
         {points.map((point, index) => (
           <g key={`${point.label}-${index}`}>
-            <circle
-              cx={point.x}
-              cy={point.y}
-              r="4"
-              className="dashboard-chart-point"
-            >
+            <circle cx={point.x} cy={point.y} r="4" className="dashboard-chart-point">
               <title>
                 {point.label}: {point.value}
               </title>
@@ -101,9 +88,7 @@ export default function TrendChart({ data }) {
                 textAnchor="middle"
                 className="dashboard-chart-axis"
               >
-                {point.label.length > 10
-                  ? `${point.label.slice(0, 10)}…`
-                  : point.label}
+                {point.label.length > 10 ? `${point.label.slice(0, 10)}…` : point.label}
               </text>
             )}
           </g>

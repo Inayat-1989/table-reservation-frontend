@@ -1,14 +1,14 @@
-import "../../assets/css/ConfirmActionModal.css";
+import '../../assets/css/ConfirmActionModal.css';
 
 const ConfirmActionModal = ({
   isOpen,
-  title = "Are you sure?",
-  message = "Are you sure you want to continue?",
-  confirmText = "Confirm",
-  cancelText = "Go Back",
+  title = 'Are you sure?',
+  message = 'Are you sure you want to continue?',
+  confirmText = 'Confirm',
+  cancelText = 'Go Back',
   isLoading = false,
-  error = "",
-  variant = "danger",
+  error = '',
+  variant = 'danger',
   onConfirm,
   onClose,
 }) => {
@@ -34,9 +34,7 @@ const ConfirmActionModal = ({
         <div className={`confirm-action-icon confirm-action-icon-${variant}`}>
           <i
             className={
-              variant === "danger"
-                ? "bi bi-exclamation-triangle"
-                : "bi bi-question-circle"
+              variant === 'danger' ? 'bi bi-exclamation-triangle' : 'bi bi-question-circle'
             }
             aria-hidden="true"
           />

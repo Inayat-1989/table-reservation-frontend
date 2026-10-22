@@ -309,7 +309,7 @@
   height: 100px;
   background: var(--stat-soft, #fff0f0);
   border-radius: 50%;
-  content: "";
+  content: '';
   opacity: 0.75;
 }
 

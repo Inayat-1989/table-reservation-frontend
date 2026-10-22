@@ -1,11 +1,6 @@
-import "../../../assets/css/CancelDraftConfirmModal.css";
+import '../../../assets/css/CancelDraftConfirmModal.css';
 
-const CancelDraftConfirmModal = ({
-  isCancelling,
-  error,
-  onConfirm,
-  onClose,
-}) => {
+const CancelDraftConfirmModal = ({ isCancelling, error, onConfirm, onClose }) => {
   return (
     <div
       className="cancel-draft-backdrop"
@@ -29,8 +24,8 @@ const CancelDraftConfirmModal = ({
         <h2 id="cancel-draft-title">Cancel This Reservation?</h2>
 
         <p id="cancel-draft-description">
-          Are you sure you want to cancel your draft reservation? Your current
-          booking progress will be lost, and this action cannot be undone.
+          Are you sure you want to cancel your draft reservation? Your current booking progress will
+          be lost, and this action cannot be undone.
         </p>
 
         {error && (

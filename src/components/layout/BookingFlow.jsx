@@ -1,18 +1,18 @@
-import { useEffect, useState, useRef, useLayoutEffect } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 
-import { getActiveReservation } from "../../api/reservationApi";
+import { getActiveReservation } from '../../api/reservationApi';
 
-import BookATable from "./BookATable";
-import MenuSelection from "./MenuSelection";
-import EmailVerification from "./EmailVerification";
-import BookingSuccess from "./BookingSuccess";
+import BookATable from './BookATable';
+import BookingSuccess from './BookingSuccess';
+import EmailVerification from './EmailVerification';
+import MenuSelection from './MenuSelection';
 
 const BookingFlow = () => {
-  const [step, setStep] = useState("details");
+  const [step, setStep] = useState('details');
   const [booking, setBooking] = useState(null);
   const [isRestoring, setIsRestoring] = useState(true);
   const bookingFlowRef = useRef(null);
-const previousStepRef = useRef(null);
+  const previousStepRef = useRef(null);
 
   useEffect(() => {
     const restoreBooking = async () => {
@@ -23,34 +23,34 @@ const previousStepRef = useRef(null);
 
         if (!reservation) {
           setBooking(null);
-          setStep("details");
+          setStep('details');
           return;
         }
 
         setBooking(reservation);
 
         switch (reservation.status) {
-          case "DRAFT":
-            setStep("menu");
+          case 'DRAFT':
+            setStep('menu');
             break;
 
-          case "PENDING_VERIFICATION":
-            setStep("verification");
+          case 'PENDING_VERIFICATION':
+            setStep('verification');
             break;
 
-          case "CONFIRMED":
-            setStep("details");
+          case 'CONFIRMED':
+            setStep('details');
             break;
 
           default:
             setBooking(null);
-            setStep("details");
+            setStep('details');
         }
       } catch (error) {
-        console.error("Booking Flow : Failed to restore reservation:", error);
+        console.error('Booking Flow : Failed to restore reservation:', error);
 
         setBooking(null);
-        setStep("details");
+        setStep('details');
       } finally {
         setIsRestoring(false);
       }
@@ -76,51 +76,46 @@ const previousStepRef = useRef(null);
     const element = bookingFlowRef.current;
     if (!element) return;
 
-    const headerHeight =
-      document.getElementById("header")?.offsetHeight ?? 0;
+    const headerHeight = document.getElementById('header')?.offsetHeight ?? 0;
 
-    const targetY =
-      element.getBoundingClientRect().top +
-      window.scrollY -
-      headerHeight -
-      16;
+    const targetY = element.getBoundingClientRect().top + window.scrollY - headerHeight - 16;
 
     window.scrollTo({
       top: Math.max(0, targetY),
-      behavior: "smooth",
+      behavior: 'smooth',
     });
   }, [step, isRestoring]);
 
   const handleBookingSubmit = (reservation) => {
     setBooking(reservation);
 
-    setStep("menu");
+    setStep('menu');
   };
 
   const handleMenuContinue = (reservation) => {
     setBooking(reservation);
 
-    console.log("Booking Flow : Pending Verification:", reservation);
+    console.log('Booking Flow : Pending Verification:', reservation);
 
-    setStep("verification");
+    setStep('verification');
   };
 
   const handleEmailVerified = (reservation) => {
     setBooking(reservation);
 
-    console.log("Booking Flow : Confirmed Reservation:", reservation);
+    console.log('Booking Flow : Confirmed Reservation:', reservation);
 
-    setStep("success");
+    setStep('success');
   };
 
   const handleBookingCancelled = () => {
     setBooking(null);
-    setStep("details");
+    setStep('details');
   };
 
   const handleBookAnother = () => {
     setBooking(null);
-    setStep("details");
+    setStep('details');
   };
 
   return (
@@ -131,20 +126,18 @@ const previousStepRef = useRef(null);
         </div>
       ) : (
         <>
-          {step === "details" && (
-            <BookATable onBookingSubmit={handleBookingSubmit} />
-          )}
+          {step === 'details' && <BookATable onBookingSubmit={handleBookingSubmit} />}
 
-          {step === "menu" && (
+          {step === 'menu' && (
             <MenuSelection
               booking={booking}
               onContinue={handleMenuContinue}
-              onBack={() => setStep("details")}
+              onBack={() => setStep('details')}
               onCancelDraft={handleBookingCancelled}
             />
           )}
 
-          {step === "verification" && (
+          {step === 'verification' && (
             <EmailVerification
               booking={booking}
               onVerified={handleEmailVerified}
@@ -152,11 +145,8 @@ const previousStepRef = useRef(null);
             />
           )}
 
-          {step === "success" && (
-            <BookingSuccess
-              booking={booking}
-              onBookAnother={handleBookAnother}
-            />
+          {step === 'success' && (
+            <BookingSuccess booking={booking} onBookAnother={handleBookAnother} />
           )}
         </>
       )}

@@ -1,6 +1,6 @@
 const MenuItemCard = ({ item, selected, disabled, onToggle }) => {
   const handleKeyDown = (event) => {
-    if (disabled || (event.key !== "Enter" && event.key !== " ")) {
+    if (disabled || (event.key !== 'Enter' && event.key !== ' ')) {
       return;
     }
 
@@ -9,8 +9,8 @@ const MenuItemCard = ({ item, selected, disabled, onToggle }) => {
   };
 
   const formatPrice = (price) => {
-    if (price == null || price === "") {
-      return "";
+    if (price == null || price === '') {
+      return '';
     }
 
     const numericPrice = Number(price);
@@ -19,15 +19,15 @@ const MenuItemCard = ({ item, selected, disabled, onToggle }) => {
       return price;
     }
 
-    return `$. ${numericPrice.toLocaleString("en-US")}`;
+    return `$. ${numericPrice.toLocaleString('en-US')}`;
   };
 
   return (
     <div className="col-lg-4 col-md-6" key={item.id}>
       <div
         className={`menu-selection-item h-100 ${
-          item.isSpecial ? "special-item" : ""
-        } ${selected ? "selected" : ""}`}
+          item.isSpecial ? 'special-item' : ''
+        } ${selected ? 'selected' : ''}`}
         onClick={() => {
           if (!disabled) {
             onToggle(item);
@@ -37,17 +37,12 @@ const MenuItemCard = ({ item, selected, disabled, onToggle }) => {
         role="button"
         aria-pressed={selected}
         aria-disabled={disabled}
-        aria-label={`${item.title}, ${selected ? "selected" : "not selected"}`}
+        aria-label={`${item.title}, ${selected ? 'selected' : 'not selected'}`}
         tabIndex={disabled ? -1 : 0}
       >
         <div className="menu-selection-image position-relative">
           {item.src ? (
-            <img
-              src={item.src}
-              className="menu-selection-image"
-              alt={item.title}
-              loading="lazy"
-            />
+            <img src={item.src} className="menu-selection-image" alt={item.title} loading="lazy" />
           ) : (
             <div className="text-center p-5">Image unavailable</div>
           )}

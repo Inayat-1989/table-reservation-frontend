@@ -1,20 +1,20 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from 'react';
 
 import {
-  updateDraftMenu,
+  cancelDraftReservation,
   finalizeDraftReservation,
   getAvailableMenu,
-  cancelDraftReservation,
-} from "../../api/reservationApi";
+  updateDraftMenu,
+} from '../../api/reservationApi';
 
-import "../../assets/css/MenuSelection.css";
+import '../../assets/css/MenuSelection.css';
 
-import MenuSelectionHeader from "./menu-selection/MenuSelectionHeader";
-import MenuSelectionState from "./menu-selection/MenuSelectionState";
-import MenuItemsGrid from "./menu-selection/MenuItemsGrid";
-import MenuSelectionError from "./menu-selection/MenuSelectionError";
-import MenuSelectionActions from "./menu-selection/MenuSelectionActions";
-import ConfirmActionModal from "../common/ConfirmActionModal";
+import ConfirmActionModal from '../common/ConfirmActionModal';
+import MenuItemsGrid from './menu-selection/MenuItemsGrid';
+import MenuSelectionActions from './menu-selection/MenuSelectionActions';
+import MenuSelectionError from './menu-selection/MenuSelectionError';
+import MenuSelectionHeader from './menu-selection/MenuSelectionHeader';
+import MenuSelectionState from './menu-selection/MenuSelectionState';
 const getMenuItemsFromResponse = (response) => {
   if (Array.isArray(response)) {
     return response;
@@ -34,9 +34,9 @@ const getMenuItemsFromResponse = (response) => {
 const normalizeMenuItem = (item) => ({
   ...item,
   id: item.id,
-  title: item.title ?? item.name ?? "",
-  description: item.description ?? "",
-  src: item.src ?? item.image ?? item.image_url ?? "",
+  title: item.title ?? item.name ?? '',
+  description: item.description ?? '',
+  src: item.src ?? item.image ?? item.image_url ?? '',
   price: item.price,
   isSpecial: item.is_special ?? item.isSpecial ?? false,
   isAvailable: item.is_available ?? item.isAvailable ?? true,
@@ -45,8 +45,8 @@ const normalizeMenuItem = (item) => ({
 const MenuSelection = ({ booking, onContinue, onBack, onCancelDraft }) => {
   const [menuItems, setMenuItems] = useState([]);
   const [selectedItems, setSelectedItems] = useState([]);
-  const [submitError, setSubmitError] = useState("");
-  const [menuError, setMenuError] = useState("");
+  const [submitError, setSubmitError] = useState('');
+  const [menuError, setMenuError] = useState('');
   const [isLoadingMenu, setIsLoadingMenu] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isCancellingDraft, setIsCancellingDraft] = useState(false);
@@ -59,31 +59,25 @@ const MenuSelection = ({ booking, onContinue, onBack, onCancelDraft }) => {
 
   const loadMenu = useCallback(async () => {
     setIsLoadingMenu(true);
-    setMenuError("");
+    setMenuError('');
 
     try {
       const response = await getAvailableMenu();
 
       const items = getMenuItemsFromResponse(response)
         .map(normalizeMenuItem)
-        .filter(
-          (item) => item.id != null && item.isAvailable && item.isSpecial,
-        );
+        .filter((item) => item.id != null && item.isAvailable && item.isSpecial);
 
       setMenuItems(items);
 
       // Keep only selections that remain available.
       setSelectedItems((previousItems) =>
-        previousItems.filter((selectedItem) =>
-          items.some((item) => item.id === selectedItem.id),
-        ),
+        previousItems.filter((selectedItem) => items.some((item) => item.id === selectedItem.id)),
       );
     } catch (error) {
-      console.error("Menu Selection: Failed to load menu:", error);
+      console.error('Menu Selection: Failed to load menu:', error);
 
-      setMenuError(
-        error.message || "Unable to load the menu. Please try again.",
-      );
+      setMenuError(error.message || 'Unable to load the menu. Please try again.');
     } finally {
       setIsLoadingMenu(false);
     }
@@ -101,17 +95,13 @@ const MenuSelection = ({ booking, onContinue, onBack, onCancelDraft }) => {
       return;
     }
 
-    setSubmitError("");
+    setSubmitError('');
 
     setSelectedItems((previousItems) => {
-      const alreadySelected = previousItems.some(
-        (selectedItem) => selectedItem.id === item.id,
-      );
+      const alreadySelected = previousItems.some((selectedItem) => selectedItem.id === item.id);
 
       if (alreadySelected) {
-        return previousItems.filter(
-          (selectedItem) => selectedItem.id !== item.id,
-        );
+        return previousItems.filter((selectedItem) => selectedItem.id !== item.id);
       }
 
       return [...previousItems, item];
@@ -131,7 +121,7 @@ const MenuSelection = ({ booking, onContinue, onBack, onCancelDraft }) => {
       return;
     }
 
-    setSubmitError("");
+    setSubmitError('');
     setIsCancelModalOpen(true);
   };
 
@@ -142,7 +132,7 @@ const MenuSelection = ({ booking, onContinue, onBack, onCancelDraft }) => {
 
     try {
       setIsCancellingDraft(true);
-      setSubmitError("");
+      setSubmitError('');
 
       await cancelDraftReservation();
 
@@ -151,12 +141,9 @@ const MenuSelection = ({ booking, onContinue, onBack, onCancelDraft }) => {
       // Leave the booking flow only after successful cancellation.
       onCancelDraft?.();
     } catch (error) {
-      console.error("Menu Selection: Failed to cancel draft:", error);
+      console.error('Menu Selection: Failed to cancel draft:', error);
 
-      setSubmitError(
-        error.message ||
-          "Unable to cancel the draft reservation. Please try again.",
-      );
+      setSubmitError(error.message || 'Unable to cancel the draft reservation. Please try again.');
     } finally {
       setIsCancellingDraft(false);
     }
@@ -167,7 +154,7 @@ const MenuSelection = ({ booking, onContinue, onBack, onCancelDraft }) => {
       return;
     }
 
-    setSubmitError("");
+    setSubmitError('');
 
     const selectedMenuItemIds = selectedItems.map((item) => item.id);
 
@@ -176,48 +163,36 @@ const MenuSelection = ({ booking, onContinue, onBack, onCancelDraft }) => {
 
       const updatedReservation = await updateDraftMenu(selectedMenuItemIds);
 
-      console.log(
-        "Menu Selection: Updated Draft Reservation:",
-        updatedReservation,
-      );
+      console.log('Menu Selection: Updated Draft Reservation:', updatedReservation);
 
       const pendingReservation = await finalizeDraftReservation();
 
-      console.log(
-        "Menu Selection: Pending Verification Reservation:",
-        pendingReservation,
-      );
+      console.log('Menu Selection: Pending Verification Reservation:', pendingReservation);
 
       onContinue(pendingReservation);
     } catch (error) {
-      console.error("Menu Selection: Failed to finalize reservation:", error);
+      console.error('Menu Selection: Failed to finalize reservation:', error);
 
-      if (error.code === "SESSION_NOT_FOUND") {
+      if (error.code === 'SESSION_NOT_FOUND') {
         setSubmitError(
-          "Your reservation session could not be found. Please start the booking again.",
+          'Your reservation session could not be found. Please start the booking again.',
         );
-      } else if (error.code === "SLOT_CAPACITY_EXCEEDED") {
+      } else if (error.code === 'SLOT_CAPACITY_EXCEEDED') {
         setSubmitError(
-          "There are no longer enough seats available for this time. Please go back and select another time.",
+          'There are no longer enough seats available for this time. Please go back and select another time.',
         );
-      } else if (error.code === "INVALID_MENU_SELECTION") {
+      } else if (error.code === 'INVALID_MENU_SELECTION') {
+        setSubmitError(error.message || 'One or more selected menu items are no longer available.');
+      } else if (error.code === 'RESERVATION_STATE_ERROR') {
+        setSubmitError(error.message || 'Your reservation can no longer be finalized.');
+      } else if (error.code === 'RESERVATION_ERROR') {
         setSubmitError(
-          error.message ||
-            "One or more selected menu items are no longer available.",
-        );
-      } else if (error.code === "RESERVATION_STATE_ERROR") {
-        setSubmitError(
-          error.message || "Your reservation can no longer be finalized.",
-        );
-      } else if (error.code === "RESERVATION_ERROR") {
-        setSubmitError(
-          error.message ||
-            "The reservation could not be completed. Please try again.",
+          error.message || 'The reservation could not be completed. Please try again.',
         );
       } else {
         setSubmitError(
           error.message ||
-            "Something went wrong while finalizing your reservation. Please try again.",
+            'Something went wrong while finalizing your reservation. Please try again.',
         );
       }
     } finally {
@@ -248,7 +223,7 @@ const MenuSelection = ({ booking, onContinue, onBack, onCancelDraft }) => {
           />
         )}
 
-        <MenuSelectionError message={isCancelModalOpen ? "" : submitError} />
+        <MenuSelectionError message={isCancelModalOpen ? '' : submitError} />
         <MenuSelectionActions
           onBack={handleBack}
           onCancelDraft={handleCancelDraft}
@@ -267,14 +242,14 @@ const MenuSelection = ({ booking, onContinue, onBack, onCancelDraft }) => {
         confirmText="Confirm Cancellation"
         cancelText="Keep Booking"
         isLoading={isCancellingDraft}
-        error={isCancelModalOpen ? submitError : ""}
+        error={isCancelModalOpen ? submitError : ''}
         variant="danger"
         onConfirm={confirmCancelDraft}
         onClose={() => {
           if (isCancellingDraft) return;
 
           setIsCancelModalOpen(false);
-          setSubmitError("");
+          setSubmitError('');
         }}
       />
     </section>

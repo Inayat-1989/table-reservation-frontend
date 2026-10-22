@@ -1,15 +1,15 @@
-import { useState } from "react";
-import { Navigate, useNavigate } from "react-router-dom";
-import { useAdminAuth } from "../context/AdminAuthContext";
-import LoadingSpinner from "../components/common/LoadingSpinner";
+import { useState } from 'react';
+import { Navigate, useNavigate } from 'react-router-dom';
+import LoadingSpinner from '../components/common/LoadingSpinner';
+import { useAdminAuth } from '../context/AdminAuthContext';
 
 export default function LoginPage() {
   const navigate = useNavigate();
   const { login, isAuthenticated, isLoading } = useAdminAuth();
 
-  const [identifier, setIdentifier] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+  const [identifier, setIdentifier] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   if (isLoading) {
@@ -22,14 +22,14 @@ export default function LoginPage() {
 
   async function handleSubmit(event) {
     event.preventDefault();
-    setError("");
+    setError('');
     setIsSubmitting(true);
 
     try {
       await login(identifier.trim(), password);
-      navigate("/admin_portal/verify-otp");
+      navigate('/admin_portal/verify-otp');
     } catch (error) {
-      setError(error.message || "Unable to sign in. Please try again.");
+      setError(error.message || 'Unable to sign in. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
@@ -73,7 +73,7 @@ export default function LoginPage() {
           )}
 
           <button type="submit" disabled={isSubmitting}>
-            {isSubmitting ? "Signing in..." : "Sign In"}
+            {isSubmitting ? 'Signing in...' : 'Sign In'}
           </button>
         </form>
       </section>

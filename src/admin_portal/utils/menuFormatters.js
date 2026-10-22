@@ -1,10 +1,10 @@
 export function formatPrice(value) {
   const amount = Number(value);
-  if (!Number.isFinite(amount)) return value ?? "—";
+  if (!Number.isFinite(amount)) return value ?? '—';
 
-  return new Intl.NumberFormat("en-PK", {
-    style: "currency",
-    currency: "USD",
+  return new Intl.NumberFormat('en-PK', {
+    style: 'currency',
+    currency: 'USD',
     maximumFractionDigits: 2,
   }).format(amount);
 }

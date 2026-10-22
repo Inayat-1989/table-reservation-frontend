@@ -1,14 +1,13 @@
-
-import { useEffect, useRef } from "react";
+import { useEffect, useRef } from 'react';
 
 import {
   formatDate,
   formatTime,
+  getCancelButtonLabel,
   getStatusClass,
   getStatusLabel,
   isCancellationDisabled,
-  getCancelButtonLabel,
-} from "./reservationUtils";
+} from './reservationUtils';
 
 const MobileReservationCarousel = ({
   reservations,
@@ -26,12 +25,7 @@ const MobileReservationCarousel = ({
   useEffect(() => {
     const sentinel = sentinelRef.current;
 
-    if (
-      !sentinel ||
-      !hasNextPage ||
-      isLoadingMore ||
-      !("IntersectionObserver" in window)
-    ) {
+    if (!sentinel || !hasNextPage || isLoadingMore || !('IntersectionObserver' in window)) {
       return undefined;
     }
 
@@ -43,7 +37,7 @@ const MobileReservationCarousel = ({
       },
       {
         root: null,
-        rootMargin: "0px 0px 250px 0px",
+        rootMargin: '0px 0px 250px 0px',
         threshold: 0,
       },
     );
@@ -63,8 +57,7 @@ const MobileReservationCarousel = ({
         <h3>Reservation History</h3>
 
         <span className="mobile-reservations-count">
-          {totalCount}{" "}
-          {totalCount === 1 ? "reservation" : "reservations"}
+          {totalCount} {totalCount === 1 ? 'reservation' : 'reservations'}
         </span>
       </div>
 
@@ -84,11 +77,7 @@ const MobileReservationCarousel = ({
                   <h4>{reservation.reference_code}</h4>
                 </div>
 
-                <span
-                  className={`reservation-status ${getStatusClass(
-                    reservation.status,
-                  )}`}
-                >
+                <span className={`reservation-status ${getStatusClass(reservation.status)}`}>
                   {getStatusLabel(reservation.status)}
                 </span>
               </div>
@@ -98,9 +87,7 @@ const MobileReservationCarousel = ({
                   <i className="bi bi-calendar3" />
                   <div>
                     <span>Date</span>
-                    <strong>
-                      {formatDate(reservation.slot_start)}
-                    </strong>
+                    <strong>{formatDate(reservation.slot_start)}</strong>
                   </div>
                 </div>
 
@@ -108,9 +95,7 @@ const MobileReservationCarousel = ({
                   <i className="bi bi-clock" />
                   <div>
                     <span>Time Slot</span>
-                    <strong>
-                      {formatTime(reservation.slot_start)}
-                    </strong>
+                    <strong>{formatTime(reservation.slot_start)}</strong>
                   </div>
                 </div>
 
@@ -119,12 +104,12 @@ const MobileReservationCarousel = ({
                   <div>
                     <span>Guests</span>
                     <strong>
-                      {reservation.guest_count ?? "Not provided"}
+                      {reservation.guest_count ?? 'Not provided'}
                       {reservation.guest_count != null
                         ? Number(reservation.guest_count) === 1
-                          ? " Guest"
-                          : " Guests"
-                        : ""}
+                          ? ' Guest'
+                          : ' Guests'
+                        : ''}
                     </strong>
                   </div>
                 </div>
@@ -136,9 +121,9 @@ const MobileReservationCarousel = ({
                     <strong>
                       {selectedItems.length > 0
                         ? `${selectedItems.length} special ${
-                            selectedItems.length === 1 ? "item" : "items"
+                            selectedItems.length === 1 ? 'item' : 'items'
                           }`
-                        : "None selected"}
+                        : 'None selected'}
                     </strong>
                   </div>
                 </div>
@@ -157,9 +142,7 @@ const MobileReservationCarousel = ({
                 <button
                   type="button"
                   className="mobile-reservation-details-button"
-                  onClick={() =>
-                    onSelect(reservation.reference_code)
-                  }
+                  onClick={() => onSelect(reservation.reference_code)}
                 >
                   <i className="bi bi-eye" />
                   View Details
@@ -168,13 +151,8 @@ const MobileReservationCarousel = ({
                 <button
                   type="button"
                   className="reservation-cancel-button"
-                  disabled={isCancellationDisabled(
-                    reservation,
-                    isCancelling,
-                  )}
-                  onClick={() =>
-                    onCancel(reservation.reference_code)
-                  }
+                  disabled={isCancellationDisabled(reservation, isCancelling)}
+                  onClick={() => onCancel(reservation.reference_code)}
                 >
                   {getCancelButtonLabel(reservation, isCancelling)}
                 </button>
@@ -184,11 +162,7 @@ const MobileReservationCarousel = ({
         })}
       </div>
 
-      <div
-        ref={sentinelRef}
-        className="mobile-reservation-load-more"
-        aria-live="polite"
-      >
+      <div ref={sentinelRef} className="mobile-reservation-load-more" aria-live="polite">
         {isLoadingMore && (
           <p>
             <span
@@ -200,9 +174,7 @@ const MobileReservationCarousel = ({
           </p>
         )}
 
-        {!hasNextPage && (
-          <p>You've reached the end of your reservations.</p>
-        )}
+        {!hasNextPage && <p>You've reached the end of your reservations.</p>}
       </div>
 
       <p className="mobile-reservation-hint">
